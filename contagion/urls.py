@@ -18,12 +18,16 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 from rest_framework import routers
 
-from contagion import views
+from contagion.views import (
+    UserViewSet, GroupViewSet, LocalityViewSet, DayDataViewSet
+)
 from contagion.settings import API_VERSION
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
+router.register(r'localities', LocalityViewSet)
+router.register(r'day-data', DayDataViewSet)
 
 
 urlpatterns = [

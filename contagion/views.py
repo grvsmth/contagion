@@ -1,7 +1,10 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import permissions, viewsets
 
-from contagion.serializers import GroupSerializer, UserSerializer
+from contagion.models import Locality, DayData
+from contagion.serializers import (
+    GroupSerializer, UserSerializer, LocalitySerializer, DayDataSerializer
+)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -20,3 +23,17 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all().order_by('name')
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class LocalityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Locality.objects.all().order_by('name')
+    serializer_class = LocalitySerializer
+
+class DayDataViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = DayData.objects.all().order_by('date_of_interest')
+    serializer_class = DayDataSerializer

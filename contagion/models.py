@@ -13,7 +13,7 @@ class Locality(Model):
         "Now URL", max_length=2083, null=True, blank=True
     )
 
-class Day_Data(Model):
+class DayData(Model):
     date_of_interest = DateTimeField('date of interest')
     hospitalized_count = IntegerField()
     hospitalized_count_7day_avg = IntegerField()
