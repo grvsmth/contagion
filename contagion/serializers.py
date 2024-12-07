@@ -20,6 +20,14 @@ class LocalitySerializer(HyperlinkedModelSerializer):
         fields = ['name', 'now_url']
 
 class DayDataSerializer(HyperlinkedModelSerializer):
+    """
+    def create(self, validated_data):
+        dayData, created = DayData.objects.update_or_create(
+            date_of_interest=validated_data.get('date_of_interest', None)
+        )
+        return dayData
+    """
+
     class Meta:
         model = DayData
         fields = [

@@ -2,8 +2,9 @@ from csv import DictReader
 
 from django.core.management.base import BaseCommand, CommandError
 from requests import get
+from rest_framework.exceptions import ValidationError
 
-from contagion.models import Locality, DayData
+from contagion.models import DayData, Locality
 from contagion.serializers import DayDataSerializer
 
 
@@ -23,17 +24,30 @@ class Command(BaseCommand):
         dayDict = {key.lower(): value for key, value in row.items()}
 
         (month, day, year) = row['date_of_interest'].split('/')
+        # TODO timezone
         dayDict['date_of_interest'] = '-'.join((year, month, day)) + 'T00:00'
-        return DayDataSerializer(data=dayDict)
+
+        return dayDict
 
     def cache(self, name, content):
         cr = DictReader(content.splitlines())
         row = cr.__next__()
         print(row)
-        dayData = self.convertDayData(name, row)
-        if not dayData.is_valid():
-            raise CommandError(dayData.errors)
+        dayDict = self.convertDayData(name, row)
+        print(dayDict)
+
+        # https://stackoverflow.com/questions/37833307/django-rest-framework-post-update-if-existing-or-create
+        try:
+            dayData = DayData.objects.get(
+                date_of_interest=dayDict.get('date_of_interest')
+            )
+        except(DayData.DoesNotExist, ValidationError):
+            pass
+
+#        return DayDataSerializer(data=dayDict)
+        dayData.is_valid(raise_exception=True)
         print(dayData.data)
+
 
     def getNowUrl(self, localityName):
         try:

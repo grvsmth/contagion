@@ -9,13 +9,13 @@ from django.db.models import (
     )
 
 class Locality(Model):
-    name = CharField("Name", max_length=1000)
+    name = CharField("Name", max_length=1000, unique=True)
     now_url = CharField(
         "Now URL", max_length=2083, null=True, blank=True
     )
 
 class DayData(Model):
-    date_of_interest = DateTimeField('date of interest')
+    date_of_interest = DateTimeField('date of interest', unique=True)
     hospitalized_count = IntegerField()
     hosp_count_7day_avg = IntegerField()
     case_count = IntegerField()
