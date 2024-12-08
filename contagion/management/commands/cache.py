@@ -1,4 +1,7 @@
 from csv import DictReader
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 
 from django.core.management.base import BaseCommand, CommandError
 from requests import get
@@ -6,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 from contagion.models import DayData, Locality
 from contagion.serializers import DayDataSerializer
+from contagion.settings import TIME_ZONE
 
 
 class Command(BaseCommand):
@@ -24,8 +28,10 @@ class Command(BaseCommand):
         dayDict = {key.lower(): value for key, value in row.items()}
 
         (month, day, year) = row['date_of_interest'].split('/')
-        # TODO timezone
-        dayDict['date_of_interest'] = '-'.join((year, month, day)) + 'T00:00'
+        dateTimeOfInterest = datetime(
+            int(year), int(month), int(day), tzinfo=ZoneInfo(TIME_ZONE)
+        )
+        dayDict['date_of_interest'] = str(dateTimeOfInterest)
 
         return dayDict
 

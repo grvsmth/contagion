@@ -31,6 +31,7 @@ class DayDataSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = DayData
         fields = [
+            'id',
             'date_of_interest',
             'hospitalized_count',
             'hosp_count_7day_avg',
