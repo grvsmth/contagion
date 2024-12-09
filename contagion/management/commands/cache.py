@@ -35,7 +35,9 @@ class Command(BaseCommand):
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
         dayDict['date_of_interest'] = str(dateTimeOfInterest)
-        dayDict['Locality'] = reverse('locality-list', {'id': locality.id})
+        dayDict['Locality'] = reverse('locality-list', {'name': locality.name})
+        print('locality.name = ' + str(locality.name))
+        print('Locality = ' + dayDict['Locality'])
         dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
 
         return dayDict
