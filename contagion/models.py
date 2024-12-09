@@ -13,6 +13,7 @@ class Locality(Model):
     now_url = CharField(
         "Now URL", max_length=2083, null=True, blank=True
     )
+    time_zone_name = CharField("Time zone name", max_length=255)
 
 class DayData(Model):
     date_of_interest = DateTimeField('date of interest', unique=True)

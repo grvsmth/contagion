@@ -1,15 +1,15 @@
 from csv import DictReader
-from datetime import datetime, timezone
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 
 from django.core.management.base import BaseCommand, CommandError
 from requests import get
 from rest_framework.exceptions import ValidationError
+from rest_framework.reverse import reverse
 
 from contagion.models import DayData, Locality
 from contagion.serializers import DayDataSerializer
-from contagion.settings import TIME_ZONE
 
 
 class Command(BaseCommand):
@@ -24,38 +24,41 @@ class Command(BaseCommand):
         return res.content.decode('utf-8')
 
     @staticmethod
-    def convertDayData(name, row):
+    def convertDayData(locality, row):
         dayDict = {key.lower(): value for key, value in row.items()}
 
         (month, day, year) = row['date_of_interest'].split('/')
         dateTimeOfInterest = datetime(
-            int(year), int(month), int(day), tzinfo=ZoneInfo(TIME_ZONE)
+            int(year),
+            int(month),
+            int(day),
+            tzinfo=ZoneInfo(locality.time_zone_name)
         )
         dayDict['date_of_interest'] = str(dateTimeOfInterest)
+        dayDict['Locality'] = reverse('locality-list', {'id': locality.id})
+        dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
 
         return dayDict
 
-    def cache(self, name, content):
+    def cache(self, locality, content):
         cr = DictReader(content.splitlines())
-        row = cr.__next__()
-        print(row)
-        dayDict = self.convertDayData(name, row)
-        print(dayDict)
+        for row in cr:
+            dayDict = self.convertDayData(locality, row)
 
-        # https://stackoverflow.com/questions/37833307/django-rest-framework-post-update-if-existing-or-create
-        try:
-            dayData = DayData.objects.get(
-                date_of_interest=dayDict.get('date_of_interest')
-            )
-        except(DayData.DoesNotExist, ValidationError):
-            pass
+            # https://stackoverflow.com/questions/37833307/django-rest-framework-post-update-if-existing-or-create
+            dayData = DayDataSerializer(data=dayDict)
 
-#        return DayDataSerializer(data=dayDict)
-        dayData.is_valid(raise_exception=True)
-        print(dayData.data)
+            try:
+                dayData.instance = DayData.objects.get(
+                    date_of_interest=dayDict.get('date_of_interest')
+                )
+            except(DayData.DoesNotExist, ValidationError):
+                pass
 
+            dayData.is_valid(raise_exception=True)
+            dayData.save(Locality=locality)
 
-    def getNowUrl(self, localityName):
+    def getLocality(self, localityName):
         try:
             locality = Locality.objects.get(name=localityName)
         except Locality.DoesNotExist:
@@ -63,11 +66,10 @@ class Command(BaseCommand):
                 'Locality "%s" does not exist' % localityName
             )
 
-        return locality.now_url
+        return locality
 
     def handle(self, *args, **options):
         for localityName in options['localities']:
-            print('You want to update %s' % localityName)
-            nowUrl = self.getNowUrl(localityName)
-            content = self.fetch(nowUrl)
-            self.cache(localityName, content)
+            locality = self.getLocality(localityName)
+            content = self.fetch(locality.now_url)
+            self.cache(locality, content)

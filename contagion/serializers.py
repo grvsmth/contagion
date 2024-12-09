@@ -1,5 +1,7 @@
 from django.contrib.auth.models import Group, User
-from rest_framework.serializers import HyperlinkedModelSerializer
+from rest_framework.serializers import (
+    HyperlinkedModelSerializer, HyperlinkedIdentityField
+)
 
 from contagion.models import Locality, DayData
 
@@ -17,21 +19,14 @@ class GroupSerializer(HyperlinkedModelSerializer):
 class LocalitySerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Locality
-        fields = ['name', 'now_url']
+        fields = ['name', 'now_url', 'time_zone_name']
 
 class DayDataSerializer(HyperlinkedModelSerializer):
-    """
-    def create(self, validated_data):
-        dayData, created = DayData.objects.update_or_create(
-            date_of_interest=validated_data.get('date_of_interest', None)
-        )
-        return dayData
-    """
-
+    localityUrl = HyperlinkedIdentityField(view_name='locality-detail')
     class Meta:
         model = DayData
         fields = [
-            'id',
+            'localityUrl',
             'date_of_interest',
             'hospitalized_count',
             'hosp_count_7day_avg',
