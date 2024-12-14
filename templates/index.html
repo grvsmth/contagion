@@ -14,24 +14,42 @@
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Infectious disease dashboard</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler"
+                    type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
         </nav>
         <div class="container">
-            <div class="row">
+            <div class="row row-cols-1 row-cols-md-2 py-2">
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">Hospitalizations in NYC</h5>
+                            <h5 class="card=title">
+                                COVID Hospitalizations in NYC
+                            </h5>
                             <p class="card-text">
-                                Most recent 7-day average:
-                                <span id="nyc-hosp-7day"></span>
+                                <strong>Most recent 7-day average</strong>
+                                (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide: <span id="nyc-hosp-7day"></span>
+                                <br />
+                                Per lakh: <span id="nyc-hosp-7day-lakh"></span>
                             </p>
                             <p class="card-text">
-                                Most recent complete 7-day average:
+                                <strong>
+                                    Most recent complete 7-day average
+                                    </strong>
+                                (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
                                 <span id="nyc-hosp-7day-complete"></span>
+                                <br />
+                                Per lakh:
+                                <span id="nyc-hosp-7day-complete-lakh"></span>
                             </p>
                         </div>
                     </div>
@@ -39,14 +57,54 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">Cases in NYC</h5>
+                            <h5 class="card=title">COVID Cases in NYC</h5>
                             <p class="card-text">
                                 Most recent 7-day average:
+                                (<span class="nyc-latest-date"></span>):
                                 <span id="nyc-cases-7day"></span>
                             </p>
                             <p class="card-text">
                                 Most recent complete 7-day average:
+                                (<span class="nyc-complete-date"></span>):
                                 <span id="nyc-cases-7day-complete"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 py-2">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                (<span class="nyc-latest-date"></span>):
+                                <span id="nyc-death-7day"></span>
+                            </p>
+                            <p class="card-text">
+                                Most recent complete 7-day average:
+                                (<span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-7day-complete"></span>
+                            </p>
+                            <p class="card-text">
+                                Deaths last month:
+                                (<span class="nyc-last-month"></span>):
+                                <span id="nyc-death-last-month"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">
+                                COVID Wastewater concentration in NYC
+                            </h5>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                (<span class="wastewater-latest-date"></span>):
+                                <span id="nyc-wastewater-7day"></span>
                             </p>
                         </div>
                     </div>
