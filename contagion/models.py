@@ -27,4 +27,9 @@ class DayData(Model):
     death_count_7day_avg = IntegerField()
     incomplete = BooleanField()
 
-    Locality = ForeignKey(Locality, verbose_name="locality", on_delete=CASCADE)
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='dayData',
+        on_delete=CASCADE
+    )

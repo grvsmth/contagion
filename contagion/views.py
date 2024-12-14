@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group, User
+from django_filters.rest_framework import FilterSet
 from rest_framework import permissions, viewsets
 
 from contagion.models import Locality, DayData
@@ -6,6 +7,10 @@ from contagion.serializers import (
     GroupSerializer, UserSerializer, LocalitySerializer, DayDataSerializer
 )
 
+class DayDataFilter(FilterSet):
+    class Meta:
+        model = DayData
+        fields = ['date_of_interest', 'incomplete', 'locality']
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -24,6 +29,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
 class LocalityViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -31,9 +37,11 @@ class LocalityViewSet(viewsets.ModelViewSet):
     queryset = Locality.objects.all().order_by('name')
     serializer_class = LocalitySerializer
 
+
 class DayDataViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
     queryset = DayData.objects.all().order_by('date_of_interest')
     serializer_class = DayDataSerializer
+    filterset_class = DayDataFilter
