@@ -36,8 +36,6 @@ class Command(BaseCommand):
         )
         dayDict['date_of_interest'] = str(dateTimeOfInterest)
         dayDict['Locality'] = reverse('locality-list', {'name': locality.name})
-        print('locality.name = ' + str(locality.name))
-        print('Locality = ' + dayDict['Locality'])
         dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
 
         return dayDict

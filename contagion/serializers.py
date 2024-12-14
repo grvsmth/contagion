@@ -22,16 +22,15 @@ class LocalitySerializer(HyperlinkedModelSerializer):
         fields = ['name', 'now_url', 'time_zone_name']
 
 class DayDataSerializer(HyperlinkedModelSerializer):
-    localityUrl = HyperlinkedRelatedField(
-        view_name='localities:locality-detail',
-        lookup_field='pk',
-        read_only=True
+    Locality = HyperlinkedRelatedField(
+        view_name='locality-detail',
+        queryset=Locality.objects.all()
     )
 
     class Meta:
         model = DayData
         fields = [
-            'localityUrl',
+            'Locality',
             'date_of_interest',
             'hospitalized_count',
             'hosp_count_7day_avg',
