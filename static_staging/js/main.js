@@ -1,11 +1,13 @@
 import CacheClient from "./CacheClient.js";
+import Ui from "./Ui.js";
 
-
-const dayDataUrl = "/api/0.1/day-data/?locality=1";
-const population = 11996161;
-const lakh = 100000;
+const localityUrl = "/api/0.1/localities/?name=NYC";
 
 const cacheClient = new CacheClient();
+const localityInfo = await cacheClient.fetchData(localityUrl);
+console.log("localityInfo", localityInfo);
+
+const dayDataUrl = "/api/0.1/day-data/?locality=" + localityInfo[0].pk;
 const dayData = await cacheClient.fetchData(dayDataUrl);
 
 console.log("dayData", dayData);
@@ -15,35 +17,33 @@ const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
 });
 
-function perLakh(input) {
-    return input * lakh * 10 / population;
-}
-
-document.querySelector("#nyc-hosp-7day").innerText = latestDayData
-    .hosp_count_7day_avg;
-document.querySelector("#nyc-hosp-7day-lakh").innerText =
-    perLakh(latestDayData.hosp_count_7day_avg).toFixed(2);
-document.querySelector("#nyc-hosp-7day-complete").innerText =
-    latestComplete.hosp_count_7day_avg;
-document.querySelector("#nyc-hosp-7day-complete-lakh").innerText =
-    perLakh(latestComplete.hosp_count_7day_avg).toFixed(2);
-
-document.querySelector("#nyc-cases-7day").innerText = latestDayData
-    .all_case_count_7day_avg;
-document.querySelector("#nyc-cases-7day-complete").innerText = latestComplete
-    .all_case_count_7day_avg;
-
-document.querySelector("#nyc-death-7day").innerText = latestDayData
-    .death_count_7day_avg;
-document.querySelector("#nyc-death-7day-complete").innerText = latestComplete
-    .death_count_7day_avg;
-
-const latestDate = new Date(latestDayData.date_of_interest);
-document.querySelectorAll(".nyc-latest-date").forEach((element) => {
-    element.innerText = latestDate.toLocaleDateString();
+const ui = new Ui();
+ui.setOutput({
+    "nycHospitalization": {
+        "sevenDayAverage": document.querySelector("#nyc-hosp-7day"),
+        "sevenDayPerLakh": document.querySelector("#nyc-hosp-7day-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-hosp-7day-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-hosp-7day-complete-lakh")
+    },
+    "nycCases": {
+        "sevenDayAverage": document.querySelector("#nyc-cases-7day"),
+        "sevenDayPerLakh": document.querySelector("#nyc-cases-7day-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-cases-7day-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-cases-7day-complete-lakh")
+    },
+    "nycDeath": {
+        "sevenDayAverage": document.querySelector("#nyc-death-7day"),
+        "sevenDayComplete": document.querySelector("#nyc-death-7day-complete")
+    },
+    "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
+    "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
+    "nycSource": document.querySelectorAll(".nyc-source")
 });
 
-const latestCompleteDate = new Date(latestDayData.date_of_interest);
-document.querySelectorAll(".nyc-complete-date").forEach((element) => {
-    element.innerText = latestCompleteDate.toLocaleDateString();
-});
+ui.displayLatestData(latestDayData);
+ui.displayCompleteData(latestComplete);
+
+ui.displayNycSource(localityInfo[0]);
+

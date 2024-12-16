@@ -19,7 +19,14 @@ class GroupSerializer(HyperlinkedModelSerializer):
 class LocalitySerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Locality
-        fields = ['pk', 'name', 'now_url', 'time_zone_name']
+        fields = [
+            'pk',
+            'name',
+            'now_url',
+            'time_zone_name',
+            'source_name',
+            'info_url'
+        ]
 
 class DayDataSerializer(HyperlinkedModelSerializer):
     locality = PrimaryKeyRelatedField(

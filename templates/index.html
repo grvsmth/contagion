@@ -21,12 +21,28 @@
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link active"
+                                aria-current="page"
+                                href="#">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/api/0.1/" target="_blank">
+                              Raw cached data
+                        </a>
+                    </li>
+                </div>
             </div>
         </nav>
         <div class="container">
             <div class="row row-cols-1 row-cols-md-2 py-2">
                 <div class="col">
-                    <div class="card">
+                    <div class="card" id="nyc-hosp">
                         <div class="card-body">
                             <h5 class="card=title">
                                 COVID Hospitalizations in NYC
@@ -52,6 +68,9 @@
                                 <span id="nyc-hosp-7day-complete-lakh"></span>
                             </p>
                         </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
                     </div>
                 </div>
                 <div class="col">
@@ -59,15 +78,32 @@
                         <div class="card-body">
                             <h5 class="card=title">COVID Cases in NYC</h5>
                             <p class="card-text">
-                                Most recent 7-day average:
+                                <strong>
+                                    Most recent 7-day average:
+                                </strong>
                                 (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide:
                                 <span id="nyc-cases-7day"></span>
+                                <br />
+                                Per lakh:
+                                <span id="nyc-cases-7day-lakh"></span>
                             </p>
                             <p class="card-text">
-                                Most recent complete 7-day average:
+                                <strong>
+                                    Most recent complete 7-day average:
+                                </strong>
                                 (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
                                 <span id="nyc-cases-7day-complete"></span>
+                                <br />
+                                Per lakh:
+                                <span id="nyc-cases-7day-complete-lakh"></span>
                             </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
                         </div>
                     </div>
                 </div>
@@ -93,6 +129,9 @@
                                 <span id="nyc-death-last-month"></span>
                             </p>
                         </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
                     </div>
                 </div>
                 <div class="col">
@@ -110,6 +149,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="container" id="footer">
+
         </div>
     </body>
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js">
