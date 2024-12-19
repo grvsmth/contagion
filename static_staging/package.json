@@ -1,0 +1,28 @@
+{
+  "name": "contagion",
+  "version": "0.1.0",
+  "description": "Infectious disease dashboard",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grvsmth/contagion.git"
+  },
+  "keywords": [
+    "covid",
+    "flu",
+    "rsv"
+  ],
+  "author": "Angus Andrea Grieve-Smith",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/grvsmth/contagion/issues"
+  },
+  "homepage": "https://github.com/grvsmth/contagion#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.7"
+  }
+}
