@@ -35,7 +35,7 @@ class Command(BaseCommand):
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
         dayDict['date_of_interest'] = str(dateTimeOfInterest)
-        dayDict['Locality'] = reverse('locality-list', {'name': locality.name})
+        dayDict['locality'] = locality.pk
         dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
 
         return dayDict
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 pass
 
             dayData.is_valid(raise_exception=True)
-            dayData.save(Locality=locality)
+            dayData.save(locality=locality)
 
     def getLocality(self, localityName):
         try:
