@@ -89,4 +89,17 @@ export default class Ui {
             parent.append(sourceElement.cloneNode(true));
         });
     }
+
+    displayLastMonth(lastMonth) {
+        this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
+        const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;
+
+        this.output.nycLastMonth.forEach((element) => {
+            element.innerText = monthText;
+        });
+    }
+
+    displayThirtyDays(thirtyDays) {
+        this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
+    }
 };
