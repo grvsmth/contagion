@@ -67,6 +67,11 @@ ui.displayThirtyDays(deathsThirtyDays);
 
 ui.displayNycSource(localityInfo[0]);
 
+/**
+ * Palette via Coolors
+ *
+ * https://coolors.co/palette/780000-c1121f-fdf0d5-003049-669bbc
+ */
 const chartManager = new ChartManager();
 chartManager.displayData({
     "element": document.querySelector("#nyc-hosp-chart"),
