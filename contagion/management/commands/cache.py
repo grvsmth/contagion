@@ -24,6 +24,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def fetch(nowUrl, localityName='NYC'):
+        # TODO restrict by technology specified in environ
         if localityName == 'NYC_Wastewater':
             nowUrl = nowUrl + '?$limit=5000&$$app_token=' + NYC_OPEN_DATA.APP_TOKEN
         res = get(nowUrl)
@@ -31,9 +32,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def convertDate(locality, inputDate):
-        print('input: ' + inputDate)
         inputDatetime = make_aware(datetime.fromisoformat(inputDate))
-
         return str(inputDatetime)
 
     @classmethod
@@ -63,7 +62,6 @@ class Command(BaseCommand):
                 continue
 
             data[key] = cls.convertDate(locality, row[key])
-            print('converted: ' + data[key])
 
         data['locality'] = locality.pk
 
@@ -94,8 +92,8 @@ class Command(BaseCommand):
 
             try:
                 wastewaterData.instance = WastewaterData.objects.get(
-                    sample_date=reading.get('sample_date'),
-                    wrrf_abbreviation=reading.get('wrrf_abbreviation')
+                    sample_date=wastewaterDict.get('sample_date'),
+                    wrrf_abbreviation=wastewaterDict.get('wrrf_abbreviation')
                 )
             except(WastewaterData.DoesNotExist, ValidationError):
                 pass
