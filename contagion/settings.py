@@ -159,3 +159,9 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     Path(BASE_DIR, 'static_staging'),
 )
+
+# Credentials
+NYC_OPEN_DATA = {
+    'APP_TOKEN': environ.get('APP_TOKEN'),
+    'SECRET_TOKEN': environ.get('SECRET_TOKEN')
+}

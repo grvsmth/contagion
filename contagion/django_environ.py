@@ -25,5 +25,7 @@ def set_environ():
         'DJANGO_ALLOWED_HOSTS': '[]',
         'DJANGO_TIMEZONE': "America/New_York",
         'JWT_EXPIRATION': '2',
-        'JWT_EXPIRATION_UNITS': 'days'
+        'JWT_EXPIRATION_UNITS': 'days',
+        'NYC_APP_TOKEN': 'D6gIuTeI4NSmrdqjPBzdre4VI',
+        'NYC_SECRET_TOKEN': 'vu55d0P-nWBFJ5STzHpGr06lYtAhKtBGuWxG'
         })
