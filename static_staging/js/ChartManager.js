@@ -16,6 +16,17 @@ export default class ChartManager {
         new Chart (
             config.element,
             {
+                "options": {
+                    "plugins": {
+                        "legend": {
+                            "display": false
+                        },
+                        "title": {
+                            "display": true,
+                            "text": config.title
+                        }
+                    }
+                },
                 "type": config.chartType,
                 "data": {
                     "labels": config.data.map(row =>
@@ -24,7 +35,6 @@ export default class ChartManager {
                     "datasets": [
                         {
                             "backgroundColor": config.backgroundColor,
-                            "label": config.title,
                             "data": config.data.map(row =>
                                 row[config.seriesKey]
                             )
