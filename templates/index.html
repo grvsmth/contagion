@@ -47,6 +47,9 @@
                             <h5 class="card=title">
                                 COVID Hospitalizations in NYC
                             </h5>
+                            <div>
+                                <canvas id="nyc-hosp-chart"></canvas>
+                            </div>
                             <p class="card-text">
                                 <strong>Most recent 7-day average</strong>
                                 (<span class="nyc-latest-date"></span>):
@@ -75,6 +78,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card=title">COVID Cases in NYC</h5>
+                            <div>
+                                <canvas id="nyc-cases-chart"></canvas>
+                            </div>
                             <p class="card-text">
                                 <strong>
                                     Most recent 7-day average:
@@ -109,6 +115,9 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <div>
+                                <canvas id="nyc-deaths-chart"></canvas>
+                            </div>
                             <p class="card-text">
                                 Most recent 7-day average:
                                 (<span class="nyc-latest-date"></span>):
@@ -156,5 +165,6 @@
     </body>
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js">
     </script>
+    <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
     <script type="module" src="static/js/main.js"></script>
 </html>

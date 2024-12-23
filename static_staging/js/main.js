@@ -1,4 +1,5 @@
 import CacheClient from "./CacheClient.js";
+import ChartManager from "./ChartManager.js";
 import Ui from "./Ui.js";
 
 import compute from "./compute.js";
@@ -66,3 +67,30 @@ ui.displayThirtyDays(deathsThirtyDays);
 
 ui.displayNycSource(localityInfo[0]);
 
+const chartManager = new ChartManager();
+chartManager.displayData({
+    "element": document.querySelector("#nyc-hosp-chart"),
+    "title": "Hospitalizations per day (7-day average)",
+    "seriesKey": "hosp_count_7day_avg",
+    "chartType": "line",
+    "backgroundColor": "#C1121F",
+    "data": dayData
+});
+
+chartManager.displayData({
+    "element": document.querySelector("#nyc-cases-chart"),
+    "title": "Cases per day (7-day average, confirmed and probable)",
+    "seriesKey": "all_case_count_7day_avg",
+    "chartType": "line",
+    "backgroundColor": "#003049",
+    "data": dayData
+});
+
+chartManager.displayData({
+    "element": document.querySelector("#nyc-deaths-chart"),
+    "title": "Deaths per day",
+    "seriesKey": "death_count",
+    "chartType": "bar",
+    "backgroundColor": "#780000",
+    "data": dayData
+});
