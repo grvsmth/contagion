@@ -3,6 +3,7 @@ from django.db.models import (
     CASCADE,
     CharField,
     DateTimeField,
+    FloatField,
     ForeignKey,
     IntegerField,
     Model
@@ -33,5 +34,21 @@ class DayData(Model):
         Locality,
         verbose_name="locality",
         related_name='dayData',
+        on_delete=CASCADE
+    )
+
+class WastewaterData(Model):
+    sample_date = DateTimeField('sample date')
+    test_date = DateTimeField('test date')
+    wrrf_name = CharField("WRRF Name", max_length=2083)
+    wrrf_abbreviation = CharField("WRRF Abbreviation", max_length=10)
+    copies_l = FloatField()
+    population_served = IntegerField()
+    technology = CharField("technology", max_length=500, db_index=True)
+
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='wastewaterData',
         on_delete=CASCADE
     )

@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 from django.core.management.base import BaseCommand, CommandError
 from requests import get
 from rest_framework.exceptions import ValidationError
-from rest_framework.reverse import reverse
 
 from contagion.models import DayData, Locality
 from contagion.serializers import DayDataSerializer

@@ -3,7 +3,7 @@ from rest_framework.serializers import (
     HyperlinkedModelSerializer, PrimaryKeyRelatedField
 )
 
-from contagion.models import Locality, DayData
+from contagion.models import Locality, DayData, WastewaterData
 
 class UserSerializer(HyperlinkedModelSerializer):
     class Meta:
@@ -47,4 +47,22 @@ class DayDataSerializer(HyperlinkedModelSerializer):
             'death_count',
             'death_count_7day_avg',
             'incomplete'
+        ]
+
+class WastewaterDataSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = WastewaterData
+        fields = [
+            'locality',
+            'sample_date',
+            'test_date',
+            'wrrf_name',
+            'wrrf_abbreviation',
+            'copies_l',
+            'population_served',
+            'technology'
         ]

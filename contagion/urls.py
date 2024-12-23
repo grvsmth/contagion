@@ -19,7 +19,11 @@ from django.views.generic import TemplateView
 from rest_framework import routers
 
 from contagion.views import (
-    UserViewSet, GroupViewSet, LocalityViewSet, DayDataViewSet
+    UserViewSet,
+    GroupViewSet,
+    LocalityViewSet,
+    DayDataViewSet,
+    WastewaterDataViewSet
 )
 from contagion.settings import API_VERSION
 
@@ -28,6 +32,7 @@ router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'localities', LocalityViewSet)
 router.register(r'day-data', DayDataViewSet)
+router.register(r'wastewater-data', WastewaterDataViewSet)
 
 
 urlpatterns = [
