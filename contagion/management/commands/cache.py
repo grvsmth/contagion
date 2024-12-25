@@ -12,13 +12,21 @@ from django.utils.timezone import make_aware
 from requests import get
 from rest_framework.exceptions import ValidationError
 
-from contagion.models import DayData, Locality, WastewaterData
-from contagion.serializers import DayDataSerializer, WastewaterDataSerializer
+from contagion.models import (
+    DayData, Locality, WastewaterData, WastewaterAverage
+)
+
+from contagion.serializers import (
+    DayDataSerializer, WastewaterDataSerializer, WastewaterAverageSerializer
+)
+
 from contagion.settings import NYC_OPEN_DATA
 
+sortableFormat = '%Y-%m-%d'
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
+
     wastewaterByDate = {}
     wastewaterDates = {}
 
@@ -27,19 +35,23 @@ class Command(BaseCommand):
 
     @staticmethod
     def fetch(nowUrl, localityName='NYC'):
-        # TODO restrict by technology specified in environ
         if localityName == 'NYC_Wastewater':
             nowUrl = (nowUrl
             + '?$limit=5000&$$app_token=' + NYC_OPEN_DATA['APP_TOKEN']
             + '&technology=' + NYC_OPEN_DATA['WASTEWATER_TECHNOLOGY'])
-        print(nowUrl + "\n")
+
         res = get(nowUrl)
         return res.content.decode('utf-8')
 
     @staticmethod
-    def convertDate(locality, inputDate):
+    def convertDate(inputDate):
         inputDatetime = make_aware(datetime.fromisoformat(inputDate))
         return str(inputDatetime)
+
+    @staticmethod
+    def sortableDate(inputDate):
+        inputDatetime = make_aware(datetime.fromisoformat(inputDate))
+        return inputDatetime.strftime(sortableFormat)
 
     @classmethod
     def convertDayData(cls, locality, row):
@@ -66,7 +78,7 @@ class Command(BaseCommand):
             if not key in row:
                 continue
 
-            data[key] = self.convertDate(locality, row[key])
+            data[key] = self.convertDate(row[key])
 
         data['locality'] = locality.pk
 
@@ -75,8 +87,11 @@ class Command(BaseCommand):
             self.wastewaterDates[wrrf] = []
             self.wastewaterByDate[wrrf] = {}
 
-        self.wastewaterDates[wrrf].append(data['sample_date'])
-        self.wastewaterByDate[wrrf][data['sample_date']] = data['copies_1']
+        sortableDate = self.sortableDate(row['sample_date'])
+        self.wastewaterDates[wrrf].append(sortableDate)
+        self.wastewaterByDate[wrrf][sortableDate] = data.get(
+            'copies_l', 0
+        )
 
         return data
 
@@ -98,22 +113,39 @@ class Command(BaseCommand):
             dayData.is_valid(raise_exception=True)
             dayData.save(locality=locality)
 
-    def cacheWastewaterAverages(self):
-        firstDate = datetime.strptime(self.wastewaterDates[0])
-        lastDate = datetime.strptime(self.wastewaterDates[-1])
+    def cacheWastewaterAverage(self, data, locality):
+        averageData = WastewaterAverageSerializer(data=data)
 
-        dayCount = (lastDate - firstDate).days + 1
-        previousAverage = 0
+        try:
+            averageData.instance = WastewaterAverage.objects.get(
+                end_date=data.get('end_date')
+            )
+        except(WastewaterAverage.DoesNotExist, ValidationError):
+            pass
 
-        for wrrf, data in self.wastewaterByDate:
+        averageData.is_valid(raise_exception=True)
+        averageData.save(locality=locality)
+
+    def cacheWastewaterAverages(self, locality):
+        for wrrf, data in self.wastewaterByDate.items():
+            sortedDates = sorted(self.wastewaterDates[wrrf])
+
+            firstDate = datetime.strptime(sortedDates[0], sortableFormat)
+            lastDate = datetime.strptime(sortedDates[-1], sortableFormat)
+
+            dayCount = (lastDate - firstDate).days + 1
+            previousAverage = 0
+
             for day in range(dayCount):
                 copies = []
-                averageDate = firstDate + timedelta(day)
+                endDate = firstDate + timedelta(day)
 
-                for sampleDay in range(-7,0):
-                    sampleDate = (averageDate + timedelta(sampleDay)).isoformat()
+                for sampleDay in range(-6,0):
+                    sampleDate = (endDate
+                    + timedelta(sampleDay)).strftime(sortableFormat)
+
                     if sampleDate in data:
-                        copies.append(data[sampleDate])
+                        copies.append(float(data[sampleDate]))
 
                 if not copies:
                     continue
@@ -123,9 +155,17 @@ class Command(BaseCommand):
                 if previousAverage == average:
                     continue
 
-                sortableDate = averageDate.isoformat()
-                this.cacheWastewaterAverage(wrrf, sortableDate, average)
                 previousAverage = average
+                dbDate = str(make_aware(endDate))
+                self.cacheWastewaterAverage(
+                    {
+                        'wrrf': wrrf,
+                        'end_date': dbDate,
+                        'average': average,
+                        'locality': locality.pk
+                    },
+                    locality
+                )
 
     def cacheWastewater(self, locality, content):
         for reading in loads(content):
@@ -163,3 +203,4 @@ class Command(BaseCommand):
 
             if localityName == 'NYC_Wastewater':
                 self.cacheWastewater(locality, content)
+                self.cacheWastewaterAverages(locality)

@@ -54,3 +54,14 @@ class WastewaterData(Model):
         related_name='wastewaterData',
         on_delete=CASCADE
     )
+
+class WastewaterAverage(Model):
+    end_date = DateTimeField('end date')
+    wrrf = CharField('WRRF Abbreviation', max_length=10)
+    average = IntegerField(default=0)
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='wastewaterAverage',
+        on_delete=CASCADE
+    )
