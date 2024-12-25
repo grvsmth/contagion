@@ -99,7 +99,8 @@ export default class Ui {
         });
     }
 
-    displayThirtyDays(thirtyDays) {
+    displayThirtyDays(thirtyDays, beginDate) {
         this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
+        this.output.nycComplete30Begin.innerText = beginDate.toLocaleDateString();
     }
 };

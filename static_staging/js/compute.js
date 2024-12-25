@@ -6,9 +6,9 @@ exports.isMonth = function(dayItem) {
     return dayDate.getMonth() === this.month;
 };
 
-exports.recentDays = function(dayItem) {
+exports.dateRangeFilter = function(dayItem) {
     const dayDate = new Date(dayItem.date_of_interest);
-    return dayDate > this.beginDate;
+    return dayDate >= this.beginDate && dayDate <= this.endDate;
 };
 
 exports.addValues = function(accumulator, currentValue) {

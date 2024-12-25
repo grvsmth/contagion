@@ -23,12 +23,13 @@ const deathsLastMonth = compute.rangeTotal(
     dayData, "isMonth", monthThis, "death_count"
 );
 
-const beginDate = new Date();
-beginDate.setDate(beginDate.getDate() - 36);
+const endDate = new Date(latestComplete.date_of_interest);
+const complete30Begin = new Date(latestComplete.date_of_interest);
+complete30Begin.setDate(complete30Begin.getDate() - 30);
 
-const thirtyDayThis = {"beginDate": beginDate};
+const thirtyDayThis = {"beginDate": complete30Begin, "endDate": endDate};
 const deathsThirtyDays = compute.rangeTotal(
-    dayData, "recentDays", thirtyDayThis, "death_count"
+    dayData, "dateRangeFilter", thirtyDayThis, "death_count"
 );
 
 
@@ -57,13 +58,14 @@ ui.setOutput({
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
     "nycLastMonth": document.querySelectorAll(".last-month"),
+    "nycComplete30Begin": document.querySelector("#nyc-30days-begin"),
     "nycSource": document.querySelectorAll(".nyc-source")
 });
 
 ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
 ui.displayLastMonth(deathsLastMonth);
-ui.displayThirtyDays(deathsThirtyDays);
+ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
 
 ui.displayNycSource(localityInfo[0]);
 
