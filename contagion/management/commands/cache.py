@@ -1,7 +1,8 @@
 from copy import deepcopy
 from csv import DictReader
-from datetime import datetime
+from datetime import datetime, timedelta
 from json import loads
+from statistics import fmean
 from zoneinfo import ZoneInfo
 
 
@@ -19,7 +20,7 @@ from contagion.settings import NYC_OPEN_DATA
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
     wastewaterByDate = {}
-    wastewaterDates = []
+    wastewaterDates = {}
 
     def add_arguments(self, parser):
         parser.add_argument("localities", nargs="+")
@@ -68,8 +69,14 @@ class Command(BaseCommand):
             data[key] = self.convertDate(locality, row[key])
 
         data['locality'] = locality.pk
-        self.wastewaterDates.append(data['sample_date'])
-        self.wastewaterByDate[data['sample_date']] = data
+
+        wrrf = data['wrrf_abbreviation']
+        if not wrrf in self.wastewaterDates:
+            self.wastewaterDates[wrrf] = []
+            self.wastewaterByDate[wrrf] = {}
+
+        self.wastewaterDates[wrrf].append(data['sample_date'])
+        self.wastewaterByDate[wrrf][data['sample_date']] = data['copies_1']
 
         return data
 
@@ -92,18 +99,33 @@ class Command(BaseCommand):
             dayData.save(locality=locality)
 
     def cacheWastewaterAverages(self):
-        averages = {}
-        sevenDay = {}
-
         firstDate = datetime.strptime(self.wastewaterDates[0])
         lastDate = datetime.strptime(self.wastewaterDates[-1])
 
         dayCount = (lastDate - firstDate).days + 1
         previousAverage = 0
 
-        for day in range(dayCount):
-            # compute average
-            concentrations = []
+        for wrrf, data in self.wastewaterByDate:
+            for day in range(dayCount):
+                copies = []
+                averageDate = firstDate + timedelta(day)
+
+                for sampleDay in range(-7,0):
+                    sampleDate = (averageDate + timedelta(sampleDay)).isoformat()
+                    if sampleDate in data:
+                        copies.append(data[sampleDate])
+
+                if not copies:
+                    continue
+
+                average = round(fmean(copies))
+
+                if previousAverage == average:
+                    continue
+
+                sortableDate = averageDate.isoformat()
+                this.cacheWastewaterAverage(wrrf, sortableDate, average)
+                previousAverage = average
 
     def cacheWastewater(self, locality, content):
         for reading in loads(content):
