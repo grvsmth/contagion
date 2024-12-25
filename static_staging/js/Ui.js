@@ -101,6 +101,7 @@ export default class Ui {
 
     displayThirtyDays(thirtyDays, beginDate) {
         this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
-        this.output.nycComplete30Begin.innerText = beginDate.toLocaleDateString();
+        this.output.nycComplete30Begin.innerText = beginDate
+            .toLocaleDateString();
     }
 };

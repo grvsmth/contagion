@@ -25,7 +25,7 @@ const deathsLastMonth = compute.rangeTotal(
 
 const endDate = new Date(latestComplete.date_of_interest);
 const complete30Begin = new Date(latestComplete.date_of_interest);
-complete30Begin.setDate(complete30Begin.getDate() - 30);
+complete30Begin.setDate(complete30Begin.getDate() - 29);
 
 const thirtyDayThis = {"beginDate": complete30Begin, "endDate": endDate};
 const deathsThirtyDays = compute.rangeTotal(

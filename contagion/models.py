@@ -38,11 +38,13 @@ class DayData(Model):
     )
 
 class WastewaterData(Model):
+    annotation = CharField("annotation", max_length=4096, null=True)
     sample_date = DateTimeField('sample date')
     test_date = DateTimeField('test date', null=True)
     wrrf_name = CharField("WRRF Name", max_length=2083)
     wrrf_abbreviation = CharField("WRRF Abbreviation", max_length=10)
     copies_l = FloatField(default=0.0)
+    copies_l_x_average_flowrate = IntegerField(default=0)
     population_served = IntegerField()
     technology = CharField("technology", max_length=500, db_index=True)
 

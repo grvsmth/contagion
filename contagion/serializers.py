@@ -58,11 +58,13 @@ class WastewaterDataSerializer(HyperlinkedModelSerializer):
         model = WastewaterData
         fields = [
             'locality',
+            'annotation',
             'sample_date',
             'test_date',
             'wrrf_name',
             'wrrf_abbreviation',
             'copies_l',
+            'copies_l_x_average_flowrate',
             'population_served',
             'technology'
         ]
