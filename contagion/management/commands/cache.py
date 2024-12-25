@@ -18,6 +18,8 @@ from contagion.settings import NYC_OPEN_DATA
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
+    wastewaterByDate = {}
+    wastewaterDates = []
 
     def add_arguments(self, parser):
         parser.add_argument("localities", nargs="+")
@@ -26,7 +28,10 @@ class Command(BaseCommand):
     def fetch(nowUrl, localityName='NYC'):
         # TODO restrict by technology specified in environ
         if localityName == 'NYC_Wastewater':
-            nowUrl = nowUrl + '?$limit=5000&$$app_token=' + NYC_OPEN_DATA.APP_TOKEN
+            nowUrl = (nowUrl
+            + '?$limit=5000&$$app_token=' + NYC_OPEN_DATA['APP_TOKEN']
+            + '&technology=' + NYC_OPEN_DATA['WASTEWATER_TECHNOLOGY'])
+        print(nowUrl + "\n")
         res = get(nowUrl)
         return res.content.decode('utf-8')
 
@@ -53,17 +58,18 @@ class Command(BaseCommand):
 
         return dayDict
 
-    @classmethod
-    def convertWastewater(cls, locality, row):
+    def convertWastewater(self, locality, row):
         data = deepcopy(row)
 
         for key in ('sample_date', 'test_date'):
             if not key in row:
                 continue
 
-            data[key] = cls.convertDate(locality, row[key])
+            data[key] = self.convertDate(locality, row[key])
 
         data['locality'] = locality.pk
+        self.wastewaterDates.append(data['sample_date'])
+        self.wastewaterByDate[data['sample_date']] = data
 
         return data
 
@@ -84,6 +90,20 @@ class Command(BaseCommand):
 
             dayData.is_valid(raise_exception=True)
             dayData.save(locality=locality)
+
+    def cacheWastewaterAverages(self):
+        averages = {}
+        sevenDay = {}
+
+        firstDate = datetime.strptime(self.wastewaterDates[0])
+        lastDate = datetime.strptime(self.wastewaterDates[-1])
+
+        dayCount = (lastDate - firstDate).days + 1
+        previousAverage = 0
+
+        for day in range(dayCount):
+            # compute average
+            concentrations = []
 
     def cacheWastewater(self, locality, content):
         for reading in loads(content):
@@ -114,7 +134,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
-            content = self.fetch(locality.now_url)
+            content = self.fetch(locality.now_url, localityName)
 
             if localityName == 'NYC':
                 self.cacheDayData(locality, content)

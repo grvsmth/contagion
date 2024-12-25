@@ -162,6 +162,7 @@ STATICFILES_DIRS = (
 
 # Credentials
 NYC_OPEN_DATA = {
-    'APP_TOKEN': environ.get('APP_TOKEN'),
-    'SECRET_TOKEN': environ.get('SECRET_TOKEN')
+    'APP_TOKEN': environ.get('NYC_APP_TOKEN'),
+    'SECRET_TOKEN': environ.get('NYC_SECRET_TOKEN'),
+    'WASTEWATER_TECHNOLOGY': environ.get('NYC_WASTEWATER_TECHNOLOGY')
 }
