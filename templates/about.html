@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:creator" content="@grvsmth" />
+        <meta property="og:title" content="Contagion"></meta>
+        <meta property="og:description" content="A dashboard for tracking infectious disease data." />
+        <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="shortcut icon" href="/static/kn95.ico">
+        <title>About Contagion</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Infectious disease dashboard</a>
+                <button class="navbar-toggler"
+                    type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link active"
+                                aria-current="page"
+                                href="#">
+                                About
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/api/0.1/" target="_blank">
+                              Raw cached data
+                        </a>
+                    </li>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <h3>About Contagion</h3>
+            <p>
+                Contagion is a dashboard for tracking information about the
+                spread of infectious diseases.
+            </p>
+            <p>
+                Contagion is created by Angus Andrea Grieve-Smith.  It is not
+                intended to provide expert advice on disease prevention.
+            </p>
+            <p>
+                In two blog posts I described how I use these indicators to
+                decide <a href="https://grieve-smith.com/ftn/2024/05/how-do-we-know-its-safe/"
+                target="_blank">when to relax the precautions I take</a>, and
+                <a href="https://grieve-smith.com/ftn/2024/08/when-to-go-into-outbreak-mode/"
+                target="_blank">when to start taking more precautions</a>
+                against new outbreaks.
+            </p>
+            <p>
+                <a href="https://github.com/grvsmth/contagion" target="_blank">
+                    Source code at GitHub
+                </a>
+            </p>
+        </div>
+    </body>
+    <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js">
+    </script>
+</html>

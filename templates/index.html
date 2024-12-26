@@ -1,5 +1,187 @@
+<!DOCTYPE html>
 <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:creator" content="@grvsmth" />
+        <meta property="og:title" content="Contagion"></meta>
+        <meta property="og:description" content="A dashboard for tracking infectious disease data." />
+        <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="shortcut icon" href="/static/kn95.ico">
+        <title>Contagion</title>
+    </head>
     <body>
-        <p>Hello contagious world!</p>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Infectious disease dashboard</a>
+                <button class="navbar-toggler"
+                    type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link active"
+                                aria-current="page"
+                                href="#">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="about.html">About</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="/api/0.1/" target="_blank">
+                              Raw cached data
+                        </a>
+                    </li>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row row-cols-1 row-cols-md-2 py-2">
+                <div class="col">
+                    <div class="card" id="nyc-hosp">
+                        <div class="card-body">
+                            <h5 class="card=title">
+                                COVID Hospitalizations in NYC
+                            </h5>
+                            <div>
+                                <canvas id="nyc-hosp-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                <strong>Most recent 7-day average</strong>
+                                (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide: <span id="nyc-hosp-7day"></span>,
+                                Per lakh: <span id="nyc-hosp-7day-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average
+                                    </strong>
+                                (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-hosp-7day-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-hosp-7day-complete-lakh"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">COVID Cases in NYC</h5>
+                            <div>
+                                <canvas id="nyc-cases-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent 7-day average:
+                                </strong>
+                                (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-cases-7day"></span>,
+                                Per lakh:
+                                <span id="nyc-cases-7day-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average:
+                                </strong>
+                                (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-cases-7day-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-cases-7day-complete-lakh"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 py-2">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <div>
+                                <canvas id="nyc-deaths-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                (<span class="nyc-latest-date"></span>):
+                                <span id="nyc-death-7day"></span>
+                            </p>
+                            <p class="card-text">
+                                Most recent complete 7-day average:
+                                (<span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-7day-complete"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent month:
+                                (<span class="last-month"></span>):
+                                <span id="nyc-death-last-month"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent 30 days with
+                                complete data
+                                (<span id="nyc-30days-begin"></span> -
+                                <span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-30days"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">
+                                COVID Wastewater concentration in NYC
+                            </h5>
+                            <h6 class="card-subtitle">
+                                Wastewater facility:
+                                <span id="nyc-wrrf"></span>
+                            </h6>
+                            <p class="card-text">
+                                Most recent count
+                                (<span id="nyc-wastewater-latest-date"></span>):
+                                <span id="nyc-wastewater-latest-count"></span>
+                            </p>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                <span id="nyc-wastewater-7day"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-wastewater-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container" id="footer">
+
+        </div>
     </body>
+    <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js">
+    </script>
+    <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
+    <script type="module" src="static/js/main.js"></script>
 </html>

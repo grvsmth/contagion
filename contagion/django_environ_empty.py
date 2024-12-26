@@ -11,11 +11,11 @@ def set_environ():
     Update the environment variables
     """
     environ.update({
-        'DJANGO_SECRET_KEY': 'django-insecure-2f^ii&xc5qjin7fk$@4abk!wm(63owm#b#=_)8*1bmr82cj_0_',
+        'DJANGO_SECRET_KEY': '',
         'DJANGO_HOST': 'contation.grieve-smith.com',
         'DJANGO_DB': 'grvsmth$contagion',
         'DJANGO_DB_USER': 'grvsmth',
-        'DJANGO_DB_PASSWORD': 'myAnnotate',
+        'DJANGO_DB_PASSWORD': '',
         'DJANGO_DB_HOST': 'grvsmth.mysql.pythonanywhere-services.com',
         'DJANGO_DB_PORT': '3306',
         'DJANGO_DB_ENGINE': 'django.db.backends.mysql',
@@ -25,5 +25,7 @@ def set_environ():
         'DJANGO_ALLOWED_HOSTS': '[]',
         'DJANGO_TIMEZONE': "America/New_York",
         'JWT_EXPIRATION': '2',
-        'JWT_EXPIRATION_UNITS': 'days'
+        'JWT_EXPIRATION_UNITS': 'days',
+        'NYC_APP_TOKEN': '',
+        'NYC_SECRET_TOKEN': ''
         })

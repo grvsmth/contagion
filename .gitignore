@@ -57,10 +57,13 @@ cover/
 
 # Django stuff:
 *.log
+django_environ.py
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+migrations/
 static/admin/
+static/rest_framework/
 
 # Flask stuff:
 instance/
@@ -159,3 +162,6 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+static/
+static_staging/node_modules/
