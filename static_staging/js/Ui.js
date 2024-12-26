@@ -61,7 +61,7 @@ export default class Ui {
 
     }
 
-    static createSourceElement(locality) {
+    static createSourceElement(locality, isStale) {
         const element = document.createElement("p");
         const infoLink = document.createElement("a");
         infoLink.href = locality.info_url;
@@ -71,7 +71,12 @@ export default class Ui {
         const dataLink = document.createElement("a");
         dataLink.href = locality.now_url;
         dataLink.target = "_blank";
-        dataLink.innerText = "data";
+
+        if (isStale) {
+            dataLink.innerText = "stale data";
+        } else {
+            dataLink.innerText = "data";
+        }
 
         element.append(
             infoLink,
@@ -83,10 +88,14 @@ export default class Ui {
         return element;
     }
 
-    displayNycSource(locality) {
-        const sourceElement = Ui.createSourceElement(locality);
-        this.output.nycSource.forEach((parent) => {
+    displaySource(locality, isStale=false) {
+        const sourceElement = Ui.createSourceElement(locality, isStale);
+        this.output.sourceElement[locality.name].forEach((parent) => {
             parent.append(sourceElement.cloneNode(true));
+
+            if (isStale) {
+                parent.classList.add("bg-warning");
+            }
         });
     }
 
@@ -103,5 +112,20 @@ export default class Ui {
         this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
         this.output.nycComplete30Begin.innerText = beginDate
             .toLocaleDateString();
+    }
+
+    displayLatestWastewaterData(wastewaterData) {
+        const latestDate = new Date(wastewaterData.sample_date)
+            .toLocaleDateString();
+
+        this.output.nycWastewater.wrrf.innerText = wastewaterData.wrrf_name;
+        this.output.nycWastewater.latestDate.innerText = latestDate;
+        this.output.nycWastewater.latestCount.innerText = wastewaterData
+            .copies_l;
+    }
+
+    displayLatestWastewaterAverage(wastewaterAverage) {
+        this.output.nycWastewater.latestAverage.innerText = wastewaterAverage
+            .average;
     }
 };

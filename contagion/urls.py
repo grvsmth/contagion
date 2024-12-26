@@ -23,7 +23,8 @@ from contagion.views import (
     GroupViewSet,
     LocalityViewSet,
     DayDataViewSet,
-    WastewaterDataViewSet
+    WastewaterAverageViewSet,
+    WastewaterDataViewSet,
 )
 from contagion.settings import API_VERSION
 
@@ -32,6 +33,7 @@ router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'localities', LocalityViewSet)
 router.register(r'day-data', DayDataViewSet)
+router.register(r'wastewater-averages', WastewaterAverageViewSet)
 router.register(r'wastewater-data', WastewaterDataViewSet)
 
 
