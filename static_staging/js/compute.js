@@ -33,4 +33,16 @@ exports.rangeTotal = function(dayData, filterKey, filterThis, propertyKey) {
     };
 };
 
+exports.isStale = function(thresholdDays, inputDateString) {
+    const thresholdDate = new Date();
+    thresholdDate.setDate(thresholdDate.getDate() - thresholdDays);
+
+    const inputDate = new Date(inputDateString);
+    if (!(inputDate instanceof Date) || isNaN(inputDate)) {
+        console.log("Invalid input date!", inputDateString)
+    }
+
+    return inputDate <= thresholdDate;
+};
+
 export default exports;

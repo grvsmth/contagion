@@ -9,6 +9,7 @@ const localityName = {
     "wastewater": "NYC_Wastewater"
 };
 const wrrf = "BB";
+const staleThreshold = 30;
 
 const localityUrl = "/api/0.1/localities/";
 
@@ -59,6 +60,14 @@ const latestWastewaterAverage = wastewaterAverageData[
     wastewaterAverageData.length - 1
 ];
 
+const staleDaily = compute.isStale(
+    staleThreshold, latestComplete.date_of_interest
+);
+
+const staleWastewater = compute.isStale(
+    staleThreshold, latestWastewaterData.sample_date
+);
+
 
 const ui = new Ui();
 ui.setOutput({
@@ -106,9 +115,8 @@ ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
 
-ui.displaySource(dailyInfo);
-ui.displaySource(wastewaterInfo);
-// TODO display wastewater source
+ui.displaySource(dailyInfo, staleDaily);
+ui.displaySource(wastewaterInfo, staleWastewater);
 
 /**
  * Palette via Coolors
