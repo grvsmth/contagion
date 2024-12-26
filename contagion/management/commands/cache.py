@@ -22,7 +22,9 @@ from contagion.serializers import (
 
 from contagion.settings import NYC_OPEN_DATA
 
+averageRange = 14
 sortableFormat = '%Y-%m-%d'
+
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
@@ -140,12 +142,12 @@ class Command(BaseCommand):
                 copies = []
                 endDate = firstDate + timedelta(day)
 
-                for sampleDay in range(-6,0):
-                    sampleDate = (endDate
-                    + timedelta(sampleDay)).strftime(sortableFormat)
+                for sampleDay in range(1 - averageRange, 1):
+                    sampleDate = endDate + timedelta(sampleDay)
+                    sampleDateString = sampleDate.strftime(sortableFormat)
 
-                    if sampleDate in data:
-                        copies.append(float(data[sampleDate]))
+                    if sampleDateString in data:
+                        copies.append(float(data.get(sampleDateString)))
 
                 if not copies:
                     continue

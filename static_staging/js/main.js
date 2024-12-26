@@ -27,12 +27,10 @@ const wastewaterInfo = localityInfo.find((locality) =>
 const wastewaterUrl = "/api/0.1/wastewater-data/?locality="
     + wastewaterInfo.pk + "&wrrf_abbreviation=" + wrrf;
 const wastewaterData = await cacheClient.fetchData(wastewaterUrl);
-console.log("wastewaterData", wastewaterData);
 
 const wastewaterAverageUrl = "/api/0.1/wastewater-averages/?locality="
     + wastewaterInfo.pk + "&wrrf=" + wrrf;
 const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
-console.log("wastewaterAverageData", wastewaterAverageData);
 
 
 const latestDayData = dayData[dayData.length - 1];
@@ -121,32 +119,55 @@ ui.displaySource(wastewaterInfo, staleWastewater);
 /**
  * Palette via Coolors
  *
- * https://coolors.co/palette/780000-c1121f-fdf0d5-003049-669bbc
+ * https://coolors.co/palette/5f0f40-9a031e-fb8b24-e36414-0f4c5c
  */
 const chartManager = new ChartManager();
+const dayLabels = dayData.map(row =>
+    chartManager.formatDate(row.date_of_interest)
+);
+
 chartManager.displayData({
+    "chartType": "line",
     "element": document.querySelector("#nyc-hosp-chart"),
+    "labels": dayLabels,
     "title": "Hospitalizations per day (7-day average)",
-    "seriesKey": "hosp_count_7day_avg",
-    "chartType": "line",
-    "backgroundColor": "#C1121F",
-    "data": dayData
+    "datasets": [{
+        "backgroundColor": "#5F0F40",
+        "data": dayData.map(row => row.hosp_count_7day_avg)
+    }]
 });
 
 chartManager.displayData({
+    "chartType": "line",
     "element": document.querySelector("#nyc-cases-chart"),
+    "labels": dayLabels,
     "title": "Cases per day (7-day average, confirmed and probable)",
-    "seriesKey": "all_case_count_7day_avg",
-    "chartType": "line",
-    "backgroundColor": "#003049",
-    "data": dayData
+    "datasets": [{
+        "backgroundColor": "#9A031E",
+        "data": dayData.map(row => row.all_case_count_7day_avg)
+    }]
 });
 
 chartManager.displayData({
-    "element": document.querySelector("#nyc-deaths-chart"),
-    "title": "Deaths per day",
-    "seriesKey": "death_count",
     "chartType": "bar",
-    "backgroundColor": "#780000",
-    "data": dayData
+    "element": document.querySelector("#nyc-deaths-chart"),
+    "labels": dayLabels,
+    "title": "Deaths per day",
+    "datasets": [{
+        "backgroundColor": "#FB8B24",
+        "data": dayData.map(row => row.death_count)
+    }]
+});
+
+chartManager.displayData({
+    "element": document.querySelector("#nyc-wastewater-chart"),
+    "labels": wastewaterAverageData.map(row =>
+        chartManager.formatDate(row.end_date)
+    ),
+    "title": "Wastewater two-week averages",
+    "datasets": [{
+        "backgroundColor": "#E36414",
+        "data": wastewaterAverageData.map(row => row.average),
+        "type": "line"
+    }]
 });

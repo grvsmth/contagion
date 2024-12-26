@@ -29,17 +29,8 @@ export default class ChartManager {
                 },
                 "type": config.chartType,
                 "data": {
-                    "labels": config.data.map(row =>
-                        this.formatDate(row.date_of_interest)
-                    ),
-                    "datasets": [
-                        {
-                            "backgroundColor": config.backgroundColor,
-                            "data": config.data.map(row =>
-                                row[config.seriesKey]
-                            )
-                        }
-                    ]
+                    "labels": config.labels,
+                    "datasets": config.datasets
                 }
             }
         );
