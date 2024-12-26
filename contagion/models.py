@@ -56,8 +56,8 @@ class WastewaterData(Model):
     )
 
 class WastewaterAverage(Model):
-    end_date = DateTimeField('end date')
-    wrrf = CharField('WRRF Abbreviation', max_length=10)
+    end_date = DateTimeField('end date', db_index=True)
+    wrrf = CharField('WRRF Abbreviation', max_length=10, db_index=True)
     average = IntegerField(default=0)
     locality = ForeignKey(
         Locality,

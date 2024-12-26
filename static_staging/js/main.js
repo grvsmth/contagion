@@ -4,13 +4,35 @@ import Ui from "./Ui.js";
 
 import compute from "./compute.js";
 
-const localityUrl = "/api/0.1/localities/?name=NYC";
+const localityName = {
+    "daily": "NYC",
+    "wastewater": "NYC_Wastewater"
+};
+const wrrf = "BB";
+
+const localityUrl = "/api/0.1/localities/";
 
 const cacheClient = new CacheClient();
 const localityInfo = await cacheClient.fetchData(localityUrl);
 
-const dayDataUrl = "/api/0.1/day-data/?locality=" + localityInfo[0].pk;
+const dailyInfo = localityInfo.find((locality) =>
+    locality.name === localityName.daily);
+const dayDataUrl = "/api/0.1/day-data/?locality=" + dailyInfo.pk;
 const dayData = await cacheClient.fetchData(dayDataUrl);
+
+const wastewaterInfo = localityInfo.find((locality) =>
+    locality.name === localityName.wastewater);
+
+const wastewaterUrl = "/api/0.1/wastewater-data/?locality="
+    + wastewaterInfo.pk + "&wrrf_abbreviation=" + wrrf;
+const wastewaterData = await cacheClient.fetchData(wastewaterUrl);
+console.log("wastewaterData", wastewaterData);
+
+const wastewaterAverageUrl = "/api/0.1/wastewater-averages/?locality="
+    + wastewaterInfo.pk + "&wrrf=" + wrrf;
+const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
+console.log("wastewaterAverageData", wastewaterAverageData);
+
 
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
@@ -31,6 +53,11 @@ const thirtyDayThis = {"beginDate": complete30Begin, "endDate": endDate};
 const deathsThirtyDays = compute.rangeTotal(
     dayData, "dateRangeFilter", thirtyDayThis, "death_count"
 );
+
+const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
+const latestWastewaterAverage = wastewaterAverageData[
+    wastewaterAverageData.length - 1
+];
 
 
 const ui = new Ui();
@@ -55,11 +82,20 @@ ui.setOutput({
         "lastMonth": document.querySelector("#nyc-death-last-month"),
         "thirtyDays": document.querySelector("#nyc-death-30days")
     },
+    "nycWastewater": {
+        "latestDate": document.querySelector("#nyc-wastewater-latest-date"),
+        "latestCount": document.querySelector("#nyc-wastewater-latest-count"),
+        "latestAverage": document.querySelector("#nyc-wastewater-7day"),
+        "wrrf": document.querySelector("#nyc-wrrf")
+    },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
     "nycLastMonth": document.querySelectorAll(".last-month"),
     "nycComplete30Begin": document.querySelector("#nyc-30days-begin"),
-    "nycSource": document.querySelectorAll(".nyc-source")
+    "sourceElement": {
+        "NYC": document.querySelectorAll(".nyc-source"),
+        "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source")
+    }
 });
 
 ui.displayLatestData(latestDayData);
@@ -67,7 +103,12 @@ ui.displayCompleteData(latestComplete);
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
 
-ui.displayNycSource(localityInfo[0]);
+ui.displayLatestWastewaterData(latestWastewaterData);
+ui.displayLatestWastewaterAverage(latestWastewaterAverage);
+
+ui.displaySource(dailyInfo);
+ui.displaySource(wastewaterInfo);
+// TODO display wastewater source
 
 /**
  * Palette via Coolors

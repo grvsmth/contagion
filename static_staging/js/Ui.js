@@ -83,9 +83,9 @@ export default class Ui {
         return element;
     }
 
-    displayNycSource(locality) {
+    displaySource(locality) {
         const sourceElement = Ui.createSourceElement(locality);
-        this.output.nycSource.forEach((parent) => {
+        this.output.sourceElement[locality.name].forEach((parent) => {
             parent.append(sourceElement.cloneNode(true));
         });
     }
@@ -103,5 +103,21 @@ export default class Ui {
         this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
         this.output.nycComplete30Begin.innerText = beginDate
             .toLocaleDateString();
+    }
+
+    displayLatestWastewaterData(wastewaterData) {
+        const latestDate = new Date(wastewaterData.sample_date)
+            .toLocaleDateString();
+
+        this.output.nycWastewater.wrrf.innerText = wastewaterData.wrrf_name;
+        this.output.nycWastewater.latestDate.innerText = latestDate;
+        this.output.nycWastewater.latestCount.innerText = wastewaterData
+            .copies_l;
+    }
+
+    displayLatestWastewaterAverage(wastewaterAverage) {
+        console.log("wastewaterAverage", wastewaterAverage);
+        this.output.nycWastewater.latestAverage.innerText = wastewaterAverage
+            .average;
     }
 };
