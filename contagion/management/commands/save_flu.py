@@ -1,4 +1,5 @@
 from datetime import datetime
+from os.path import isfile
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -26,6 +27,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("date")
+        parser.add_argument(
+            "--from_cache",
+            action="store_true",
+            help="Load file from cache",
+        )
 
     @classmethod
     def fetchAndSave(cls, nowUrl, savePath, dateString):
@@ -73,16 +79,25 @@ class Command(BaseCommand):
         documentData.is_valid(raise_exception=True)
         documentData.save(locality=locality)
 
+    def extractImages(self, filePath, dateString):
+        pass
+
     def handle(self, *args, **options):
         dateString = options['date']
+        fromCache = options['from_cache']
+
         locality = self.getLocality(self.localityName)
 
         if not dateString:
             dateString = self.guessNextDate(locality)
 
         savePath = MEDIA_ROOT + FLU_PATH['PDF']
-        content = self.fetchAndSave(
-            locality.now_url, savePath, dateString
-        )
 
-        self.cacheDocumentMetadata(locality, content, dateString)
+        if not fromCache:
+            metadata = self.fetchAndSave(
+                locality.now_url, savePath, dateString
+            )
+            self.cacheDocumentMetadata(locality, metadata, dateString)
+
+        saveFileName = savePath + filePrefix + dateString + '.pdf'
+        self.extractImages(saveFileName, dateString)
