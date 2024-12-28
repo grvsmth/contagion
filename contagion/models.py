@@ -65,3 +65,27 @@ class WastewaterAverage(Model):
         related_name='wastewaterAverage',
         on_delete=CASCADE
     )
+
+class Document(Model):
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='document',
+        on_delete=CASCADE
+    )
+    mime_type = CharField("MIME type", max_length=128, db_index=True)
+    path = CharField("path", max_length=4096)
+    publication_date = DateTimeField('Publication date')
+    source_url = CharField("path", max_length=4096)
+
+
+class ChartImage(Model):
+    document = ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name='chartImage',
+        on_delete=CASCADE
+    )
+    path = CharField("path", max_length=4096)
+    chart_type = CharField('Chart type', max_length=32, db_index=True)
+    end_date = DateTimeField('end date', db_index=True)

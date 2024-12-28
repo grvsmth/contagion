@@ -4,17 +4,24 @@ from rest_framework import permissions
 from rest_framework.viewsets import ModelViewSet
 
 from contagion.models import (
-    Locality, DayData, WastewaterData, WastewaterAverage
+    ChartImage, Locality, DayData, Document, WastewaterData, WastewaterAverage
 )
 
 from contagion.serializers import (
-    GroupSerializer,
-    UserSerializer,
-    LocalitySerializer,
+    ChartImageSerializer,
     DayDataSerializer,
+    DocumentSerializer,
+    GroupSerializer,
+    LocalitySerializer,
+    UserSerializer,
     WastewaterAverageSerializer,
     WastewaterDataSerializer
 )
+
+class ChartImageFilter(FilterSet):
+    class Meta:
+        model = ChartImage
+        fields = ['end_date', 'chart_type', 'document']
 
 class DayDataFilter(FilterSet):
     class Meta:
@@ -57,6 +64,15 @@ class LocalityViewSet(ModelViewSet):
     serializer_class = LocalitySerializer
 
 
+class ChartImageViewSet(ModelViewSet):
+    """
+    API endpoint that allows chart image metadata to be viewed or edited.
+    """
+    queryset = ChartImage.objects.all().order_by('end_date')
+    serializer_class = ChartImageSerializer
+    filterset_class = ChartImageFilter
+
+
 class DayDataViewSet(ModelViewSet):
     """
     API endpoint that allows daily data (cases, deaths) to be viewed or edited.
@@ -64,6 +80,15 @@ class DayDataViewSet(ModelViewSet):
     queryset = DayData.objects.all().order_by('date_of_interest')
     serializer_class = DayDataSerializer
     filterset_class = DayDataFilter
+
+
+class DocumentViewSet(ModelViewSet):
+    """
+    API endpoint that allows document metadata to be viewed or edited.
+    """
+    queryset = Document.objects.all().order_by('publication_date')
+    serializer_class = DocumentSerializer
+
 
 class WastewaterDataViewSet(ModelViewSet):
     """

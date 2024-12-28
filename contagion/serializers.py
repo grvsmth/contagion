@@ -4,7 +4,7 @@ from rest_framework.serializers import (
 )
 
 from contagion.models import (
-    Locality, DayData, WastewaterData, WastewaterAverage
+    ChartImage, Document, Locality, DayData, WastewaterData, WastewaterAverage
 )
 
 class UserSerializer(HyperlinkedModelSerializer):
@@ -83,4 +83,34 @@ class WastewaterAverageSerializer(HyperlinkedModelSerializer):
             'end_date',
             'wrrf',
             'average'
+        ]
+
+class DocumentSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = Document
+        fields = [
+            'locality',
+            'mime_type',
+            'path',
+            'publication_date',
+            'source_url'
+        ]
+
+
+class ChartImageSerializer(HyperlinkedModelSerializer):
+    document = PrimaryKeyRelatedField(
+        queryset=Document.objects.all()
+    )
+
+    class Meta:
+        model = ChartImage
+        fields = [
+            'document',
+            'end_date',
+            'chart_type',
+            'path'
         ]

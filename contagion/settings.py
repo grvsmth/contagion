@@ -146,6 +146,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = '/home/grvsmth/contagion/media'
 MEDIA_URL = '/media/'
 
+FLU_PATH = {
+    'PDF': '/weekly-flu/pdf/',
+    'IMAGE': '/weekly-flu/image/'
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 

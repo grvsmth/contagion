@@ -14,25 +14,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf.urls.static import static
 from django.urls import include, path
 from django.views.generic import TemplateView
 from rest_framework import routers
 
 from contagion.views import (
+    DayDataViewSet,
+    DocumentViewSet,
     UserViewSet,
     GroupViewSet,
     LocalityViewSet,
-    DayDataViewSet,
     WastewaterAverageViewSet,
     WastewaterDataViewSet,
 )
-from contagion.settings import API_VERSION
+from contagion.settings import API_VERSION, MEDIA_ROOT, MEDIA_URL
 
 router = routers.DefaultRouter()
+router.register(r'day-data', DayDataViewSet)
+router.register(r'documents', DocumentViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'localities', LocalityViewSet)
-router.register(r'day-data', DayDataViewSet)
 router.register(r'wastewater-averages', WastewaterAverageViewSet)
 router.register(r'wastewater-data', WastewaterDataViewSet)
 
@@ -45,4 +48,4 @@ urlpatterns = [
     name='about'),
     path('', TemplateView.as_view(template_name='index.html'),
     name='index'),
-]
+] + static(MEDIA_URL, document_root=MEDIA_ROOT)
