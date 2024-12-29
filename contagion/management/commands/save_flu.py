@@ -24,8 +24,9 @@ mimeType = {
 }
 
 chartType = {
-    1: 'flu_cases',
-    2: 'rsv_cases'
+    1: 'flu_results',
+    4: 'rsv_results',
+    7: 'ili_visits'
 }
 
 
@@ -97,9 +98,8 @@ class Command(BaseCommand):
             self.fileDateFormat
         )
 
-    def cacheImagesMetadata(self, documentDate, imageList):
-        for imageName in imageList:
-            print(imageName)
+    def cacheImageMetadata(self, documentDate, chartType, imageName):
+        print(f'{chartType}: {imageName}')
 
     def extractImages(self, filePath, dateString):
         documentDate = datetime.strptime(dateString, self.fileDateFormat)
@@ -109,16 +109,26 @@ class Command(BaseCommand):
             print('Not a file: ' + filePath)
             exit(1)
 
-        imageList = []
+        index = 0
+
         for page_layout in extract_pages(filePath):
             for element in page_layout:
                 if isinstance(element, LTFigure):
                     for subElement in element:
                         if isinstance(subElement, LTImage):
-                            imageName = imageWriter.export_image(subElement)
-                            imageList.append(imageName)
+                            if index in chartType:
+                                (width, height) = subElement.srcsize
+                                print(f'{subElement.colorspace}')
+                                imageName = imageWriter._save_bmp(
+                                    subElement, int(width / 4),
+                                    int(height / 4), width * 3,
+                                    subElement.bits * 3
+                                )
+                                self.cacheImageMetadata(
+                                    documentDate, chartType[index], imageName
+                                )
 
-        self.cacheImagesMetadata(documentDate, imageList)
+                            index += 1
 
     def handle(self, *args, **options):
         dateString = options['date']
