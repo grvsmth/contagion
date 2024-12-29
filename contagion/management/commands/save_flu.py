@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from os.path import isfile
 
 from django.core.management.base import BaseCommand, CommandError
@@ -26,7 +26,7 @@ class Command(BaseCommand):
     localityName = 'Nyc_Flu_Pdf'
 
     def add_arguments(self, parser):
-        parser.add_argument("date")
+        parser.add_argument("--date")
         parser.add_argument(
             "--from_cache",
             action="store_true",
@@ -78,6 +78,12 @@ class Command(BaseCommand):
 
         documentData.is_valid(raise_exception=True)
         documentData.save(locality=locality)
+
+    def guessNextDate(self, locality):
+        latestDoc = Document.objects.order_by('-publication_date').first()
+        return (latestDoc.publication_date + timedelta(7)).strftime(
+            self.fileDateFormat
+        )
 
     def extractImages(self, filePath, dateString):
         pass
