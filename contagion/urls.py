@@ -20,6 +20,7 @@ from django.views.generic import TemplateView
 from rest_framework import routers
 
 from contagion.views import (
+    ChartImageViewSet,
     DayDataViewSet,
     DocumentViewSet,
     UserViewSet,
@@ -31,6 +32,7 @@ from contagion.views import (
 from contagion.settings import API_VERSION, MEDIA_ROOT, MEDIA_URL
 
 router = routers.DefaultRouter()
+router.register(r'chart-images', ChartImageViewSet)
 router.register(r'day-data', DayDataViewSet)
 router.register(r'documents', DocumentViewSet)
 router.register(r'users', UserViewSet)

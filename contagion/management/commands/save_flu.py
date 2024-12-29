@@ -1,12 +1,10 @@
 from datetime import datetime, timedelta
-from json import dumps
-from os.path import isfile
+from os import makedirs, path
 
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.timezone import make_aware
 
-from pdfminer.high_level import extract_pages
-from pdfminer.image import ImageWriter
-from pdfminer.layout import LTFigure, LTImage
+from pymupdf import open as pdfOpen
 
 from requests import get
 from rest_framework.exceptions import ValidationError
@@ -24,9 +22,9 @@ mimeType = {
 }
 
 chartType = {
-    1: 'flu_results',
-    4: 'rsv_results',
-    7: 'ili_visits'
+    37: 'flu_results',
+    44: 'rsv_results',
+    53: 'ili_visits'
 }
 
 
@@ -98,37 +96,59 @@ class Command(BaseCommand):
             self.fileDateFormat
         )
 
-    def cacheImageMetadata(self, documentDate, chartType, imageName):
-        print(f'{chartType}: {imageName}')
+    def cacheImageMetadata(self, metadata, document):
+        chartImageData = ChartImageSerializer(data=metadata)
+
+        try:
+            chartImageData.instance = ChartImage.objects.get(
+                end_date=metadata.get('end_date'),
+                chart_type=metadata.get('chart_type')
+            )
+        except(ChartImage.DoesNotExist, ValidationError):
+            pass
+
+        chartImageData.is_valid(raise_exception=True)
+        chartImageData.save(document=document)
 
     def extractImages(self, filePath, dateString):
-        documentDate = datetime.strptime(dateString, self.fileDateFormat)
-        imageWriter = ImageWriter(MEDIA_ROOT + FLU_PATH['IMAGE'] + dateString)
+        documentDate = make_aware(datetime.strptime(
+            dateString, self.fileDateFormat
+        ))
 
-        if not isfile(filePath):
+        document = Document.objects.get(path=filePath)
+
+        if not path.isfile(filePath):
             print('Not a file: ' + filePath)
             exit(1)
 
-        index = 0
+        savePath = MEDIA_ROOT + FLU_PATH['IMAGE'] + dateString
+        relativePath = FLU_PATH['IMAGE'] + dateString
+        if not path.exists(savePath):
+            makedirs(savePath)
 
-        for page_layout in extract_pages(filePath):
-            for element in page_layout:
-                if isinstance(element, LTFigure):
-                    for subElement in element:
-                        if isinstance(subElement, LTImage):
-                            if index in chartType:
-                                (width, height) = subElement.srcsize
-                                print(f'{subElement.colorspace}')
-                                imageName = imageWriter._save_bmp(
-                                    subElement, int(width / 4),
-                                    int(height / 4), width * 3,
-                                    subElement.bits * 3
-                                )
-                                self.cacheImageMetadata(
-                                    documentDate, chartType[index], imageName
-                                )
+        pdfDoc = pdfOpen(filePath)
+        for page in pdfDoc:
+            for imageMetadata in page.get_images():
+                xref = imageMetadata[0]
 
-                            index += 1
+                if xref not in chartType:
+                    continue
+
+                imageData = pdfDoc.extract_image(xref)
+                outputFilename = chartType[xref] + '.' + imageData['ext']
+
+                with open(savePath + '/' + outputFilename, 'wb') as fh:
+                    fh.write(imageData['image'])
+
+                self.cacheImageMetadata(
+                    {
+                        'document': document.pk,
+                        'end_date': documentDate,
+                        'chart_type': chartType[xref],
+                        'path': relativePath + '/' + outputFilename
+                    },
+                    document
+                )
 
     def handle(self, *args, **options):
         dateString = options['date']
