@@ -1,7 +1,12 @@
 from datetime import datetime, timedelta
+from json import dumps
 from os.path import isfile
 
 from django.core.management.base import BaseCommand, CommandError
+
+from pdfminer.high_level import extract_pages
+from pdfminer.image import ImageWriter
+from pdfminer.layout import LTFigure, LTImage
 
 from requests import get
 from rest_framework.exceptions import ValidationError
@@ -16,6 +21,11 @@ filePrefix = 'weekly-surveillance'
 mimeType = {
     'pdf': 'application/pdf',
     'png': 'image/png'
+}
+
+chartType = {
+    1: 'flu_cases',
+    2: 'rsv_cases'
 }
 
 
@@ -61,10 +71,10 @@ class Command(BaseCommand):
 
         return locality
 
-    def cacheDocumentMetadata(self, locality, content, dateTime):
+    def cacheDocumentMetadata(self, locality, content, dateString):
         content['locality'] = locality.pk
         content['publication_date'] = datetime.strptime(
-            dateTime, self.fileDateFormat
+            dateString, self.fileDateFormat
         )
 
         documentData = DocumentSerializer(data=content)
@@ -79,14 +89,36 @@ class Command(BaseCommand):
         documentData.is_valid(raise_exception=True)
         documentData.save(locality=locality)
 
+        return documentData
+
     def guessNextDate(self, locality):
         latestDoc = Document.objects.order_by('-publication_date').first()
         return (latestDoc.publication_date + timedelta(7)).strftime(
             self.fileDateFormat
         )
 
+    def cacheImagesMetadata(self, documentDate, imageList):
+        for imageName in imageList:
+            print(imageName)
+
     def extractImages(self, filePath, dateString):
-        pass
+        documentDate = datetime.strptime(dateString, self.fileDateFormat)
+        imageWriter = ImageWriter(MEDIA_ROOT + FLU_PATH['IMAGE'] + dateString)
+
+        if not isfile(filePath):
+            print('Not a file: ' + filePath)
+            exit(1)
+
+        imageList = []
+        for page_layout in extract_pages(filePath):
+            for element in page_layout:
+                if isinstance(element, LTFigure):
+                    for subElement in element:
+                        if isinstance(subElement, LTImage):
+                            imageName = imageWriter.export_image(subElement)
+                            imageList.append(imageName)
+
+        self.cacheImagesMetadata(documentDate, imageList)
 
     def handle(self, *args, **options):
         dateString = options['date']

@@ -66,6 +66,7 @@ class WastewaterAverage(Model):
         on_delete=CASCADE
     )
 
+
 class Document(Model):
     locality = ForeignKey(
         Locality,
@@ -75,7 +76,7 @@ class Document(Model):
     )
     mime_type = CharField("MIME type", max_length=128, db_index=True)
     path = CharField("path", max_length=4096)
-    publication_date = DateTimeField('Publication date')
+    publication_date = DateTimeField('Publication date', db_index=True)
     source_url = CharField("path", max_length=4096)
 
 
