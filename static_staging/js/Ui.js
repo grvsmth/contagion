@@ -7,6 +7,7 @@
  */
 const population = 11996161;
 const lakh = 100000;
+const mediaRoot = "/media";
 
 export default class Ui {
     constructor() {
@@ -100,6 +101,10 @@ export default class Ui {
     }
 
     displayChart(localityName, chartInfo) {
+        if (!(chartInfo.chart_type in this.output[localityName])) {
+            return;
+        }
+
         const imageUrl = "/media" + chartInfo.path;
         const link = document.createElement("a");
         link.target = "_blank";
@@ -112,6 +117,34 @@ export default class Ui {
         link.append(img);
         this.output[localityName][chartInfo.chart_type].append(
             link
+        );
+    }
+
+    displayPdfLink(element, documentInfo) {
+        const originalLink = document.createElement("a");
+        originalLink.target = "_blank";
+        originalLink.href = documentInfo.source_url;
+        originalLink.innerText = "source";
+
+        const cacheLink = document.createElement("a");
+        cacheLink.target = "_blank";
+        cacheLink.href = mediaRoot + documentInfo.path;
+        cacheLink.innerText = "cache";
+
+        const items = [
+            new Text("Source PDF ("),
+            originalLink,
+            new Text(") ("),
+            cacheLink,
+            new Text(")")
+        ];
+
+        element.append(...items);
+    }
+
+    displayPdfLinks(localityName, documentInfo) {
+        this.output[localityName].pdfInfo.forEach(element =>
+            this.displayPdfLink(element, documentInfo)
         );
     }
 

@@ -96,6 +96,7 @@ class DocumentSerializer(HyperlinkedModelSerializer):
             'locality',
             'mime_type',
             'path',
+            'pk',
             'publication_date',
             'source_url'
         ]

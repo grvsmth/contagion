@@ -24,7 +24,7 @@ mimeType = {
 chartType = {
     37: 'flu_results',
     44: 'rsv_results',
-    53: 'ili_visits'
+    54: 'ili_visits'
 }
 
 
@@ -43,10 +43,11 @@ class Command(BaseCommand):
         )
 
     @classmethod
-    def fetchAndSave(cls, nowUrl, savePath, dateString):
+    def fetchAndSave(cls, nowUrl, savePath, relativePath, dateString):
         fileName = filePrefix + dateString + '.pdf'
         nowUrl = nowUrl + fileName
         saveFileName = savePath + fileName
+        relativeFilePath = relativePath + fileName
 
         res = get(nowUrl, stream=True)
         with open(saveFileName, 'wb') as fh:
@@ -56,7 +57,7 @@ class Command(BaseCommand):
 
         return {
             'mime_type': mimeType['pdf'],
-            'path': saveFileName,
+            'path': relativeFilePath,
             'source_url': nowUrl
         }
 
@@ -110,19 +111,21 @@ class Command(BaseCommand):
         chartImageData.is_valid(raise_exception=True)
         chartImageData.save(document=document)
 
-    def extractImages(self, filePath, dateString):
+    def extractImages(self, relativeDocumentPath, dateString):
         documentDate = make_aware(datetime.strptime(
             dateString, self.fileDateFormat
         ))
 
-        document = Document.objects.get(path=filePath)
+        document = Document.objects.get(path=relativeDocumentPath)
 
+        filePath = MEDIA_ROOT + relativeDocumentPath
         if not path.isfile(filePath):
             print('Not a file: ' + filePath)
             exit(1)
 
-        savePath = MEDIA_ROOT + FLU_PATH['IMAGE'] + dateString
         relativePath = FLU_PATH['IMAGE'] + dateString
+        savePath = MEDIA_ROOT + relativePath
+
         if not path.exists(savePath):
             makedirs(savePath)
 
@@ -163,9 +166,9 @@ class Command(BaseCommand):
 
         if not fromCache:
             metadata = self.fetchAndSave(
-                locality.now_url, savePath, dateString
+                locality.now_url, savePath, FLU_PATH['PDF'], dateString
             )
             self.cacheDocumentMetadata(locality, metadata, dateString)
 
-        saveFileName = savePath + filePrefix + dateString + '.pdf'
+        saveFileName = FLU_PATH['PDF'] + filePrefix + dateString + '.pdf'
         self.extractImages(saveFileName, dateString)

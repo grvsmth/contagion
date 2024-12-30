@@ -36,15 +36,14 @@ const wastewaterAverageUrl = "/api/" + apiVersion
 const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
 
 const fluSourceInfo = localityInfo.find(locality =>
-    locality.name === locality.fluRsv);
+    locality.name === localityName.fluRsv);
 const documentUrl = "/api/" + apiVersion + "/documents";
 const documentInfo = await cacheClient.fetchData(documentUrl);
 
 const latestDocumentInfo = documentInfo[documentInfo.length -1];
 const fluRsvImageUrl = "/api/" + apiVersion + "/chart-images/"
-    + "?document=" + documentInfo.length;
+    + "?document=" + latestDocumentInfo.pk;
 const fluRsvImageInfo = await cacheClient.fetchData(fluRsvImageUrl);
-console.log("flu and rsv image info", fluRsvImageInfo);
 
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
@@ -79,6 +78,9 @@ const staleWastewater = compute.isStale(
     staleThreshold, latestWastewaterData.sample_date
 );
 
+const staleFlu = compute.isStale(
+    staleThreshold, latestDocumentInfo.publication_date
+);
 
 const ui = new Ui();
 ui.setOutput({
@@ -109,7 +111,10 @@ ui.setOutput({
         "wrrf": document.querySelector("#nyc-wrrf")
     },
     "NYC_Flu_Pdf": {
-        "flu_results": document.querySelector("#nyc-flu-results")
+        "flu_results": document.querySelector("#nyc-flu-results"),
+        "ili_visits": document.querySelector("#nyc-ili-visits"),
+        "pdfInfo": document.querySelectorAll(".nyc-flu-pdf"),
+        "rsv_results": document.querySelector("#nyc-rsv-results")
     },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
@@ -130,10 +135,15 @@ ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
 
-ui.displayChart(localityName.fluRsv, fluRsvImageInfo[0]);
+fluRsvImageInfo.forEach(chartInfo =>
+    ui.displayChart(localityName.fluRsv, chartInfo)
+);
+
+ui.displayPdfLinks(localityName.fluRsv, latestDocumentInfo);
 
 ui.displaySource(dailyInfo, staleDaily);
 ui.displaySource(wastewaterInfo, staleWastewater);
+ui.displaySource(fluSourceInfo, staleFlu);
 
 /**
  * Palette via Coolors
