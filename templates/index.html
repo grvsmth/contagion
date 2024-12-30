@@ -119,41 +119,6 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">COVID Deaths in NYC</h5>
-                            <div>
-                                <canvas id="nyc-deaths-chart"></canvas>
-                            </div>
-                            <p class="card-text">
-                                Most recent 7-day average:
-                                (<span class="nyc-latest-date"></span>):
-                                <span id="nyc-death-7day"></span>
-                            </p>
-                            <p class="card-text">
-                                Most recent complete 7-day average:
-                                (<span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-7day-complete"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent month:
-                                (<span class="last-month"></span>):
-                                <span id="nyc-death-last-month"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent 30 days with
-                                complete data
-                                (<span id="nyc-30days-begin"></span> -
-                                <span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-30days"></span>
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
                             <h5 class="card=title">
                                 COVID Wastewater concentration in NYC
                             </h5>
@@ -176,6 +141,50 @@
                         </div>
                         <div class="card-footer nyc-wastewater-source">
                             <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">
+                                COVID Wastewater concentration in NYC
+                            </h5>
+<div class='tableauPlaceholder' id='viz1735570512931'>
+    <noscript>
+        <a href='https://public.tableau.com/app/profile/new.york.state.department.of.health/viz/shared/54CYR2C5S'>
+            <img alt='wws_trend'
+            src='https://public.tableau.com/static/images/54/54CYR2C5S/1_rss.png'
+            style='border: none' />
+        </a>
+    </noscript>
+    <object class='tableauViz img-fluid'  style='display:none;'>
+        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+        <param name='embed_code_version' value='3' />
+        <param name='path' value='shared&#47;54CYR2C5S' />
+        <param name='toolbar' value='yes' />
+        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;54&#47;54CYR2C5S&#47;1.png' />
+        <param name='animate_transition' value='yes' />
+        <param name='display_static_image' value='yes' />
+        <param name='display_spinner' value='yes' />
+        <param name='display_overlay' value='yes' />
+        <param name='display_count' value='yes' />
+        <param name='language' value='en-US' />
+    </object>
+</div>
+                            <p class="card-text">
+
+                            </p>
+                        </div>
+                        <div class="card-footer nys-wastewater-source">
+                            <h5 class="card-title">Source</h5>
+                            <p class="card-text">
+                                <a href="https://coronavirus.health.ny.gov/covid-19-wastewater-surveillance"
+                                    target="_blank">New York State Department of
+                                    Health</a>
+                                (<a href="https://public.tableau.com/app/profile/new.york.state.department.of.health/viz/shared/54CYR2C5S"
+                                    target="_blank">open in a new window</a>)
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -220,6 +229,41 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
+                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <div>
+                                <canvas id="nyc-deaths-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                (<span class="nyc-latest-date"></span>):
+                                <span id="nyc-death-7day"></span>
+                            </p>
+                            <p class="card-text">
+                                Most recent complete 7-day average:
+                                (<span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-7day-complete"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent month:
+                                (<span class="last-month"></span>):
+                                <span id="nyc-death-last-month"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent 30 days with
+                                complete data
+                                (<span id="nyc-30days-begin"></span> -
+                                <span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-30days"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
                             <h5 class="card=title">
                                 Outpatient influenza-like illness visits in NYC
                             </h5>
@@ -242,5 +286,15 @@
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js">
     </script>
     <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
+
     <script type="module" src="static/js/main.js"></script>
+    <script type='text/javascript'>
+        const divElement = document.getElementById('viz1735570512931');
+        var vizElement = divElement.getElementsByTagName('object')[0];
+        vizElement.width = "100%";
+        vizElement.style["min-height"] = "600px";
+        const scriptElement = document.createElement('script');
+        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+    </script>
 </html>

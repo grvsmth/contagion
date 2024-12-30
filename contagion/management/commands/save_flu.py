@@ -7,6 +7,8 @@ from django.utils.timezone import make_aware
 from pymupdf import open as pdfOpen
 
 from requests import get
+from requests.exceptions import HTTPError
+
 from rest_framework.exceptions import ValidationError
 
 from contagion.models import Locality, ChartImage, Document
@@ -50,6 +52,8 @@ class Command(BaseCommand):
         relativeFilePath = relativePath + fileName
 
         res = get(nowUrl, stream=True)
+        res.raise_for_status()
+
         with open(saveFileName, 'wb') as fh:
             for chunk in res.iter_content(chunk_size=1024):
                 if chunk:
@@ -165,9 +169,15 @@ class Command(BaseCommand):
         savePath = MEDIA_ROOT + FLU_PATH['PDF']
 
         if not fromCache:
-            metadata = self.fetchAndSave(
-                locality.now_url, savePath, FLU_PATH['PDF'], dateString
-            )
+            try:
+                metadata = self.fetchAndSave(
+                    locality.now_url, savePath, FLU_PATH['PDF'], dateString
+                )
+            except HTTPError as e:
+                if e.response.status_code != 404:
+                    print('Error fetching flu PDF: ' + e.response.reason)
+                return
+
             self.cacheDocumentMetadata(locality, metadata, dateString)
 
         saveFileName = FLU_PATH['PDF'] + filePrefix + dateString + '.pdf'
