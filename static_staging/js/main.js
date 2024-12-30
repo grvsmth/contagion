@@ -6,32 +6,45 @@ import compute from "./compute.js";
 
 const localityName = {
     "daily": "NYC",
+    "fluRsv": "NYC_Flu_Pdf",
     "wastewater": "NYC_Wastewater"
 };
+
+const apiVersion = 0.1;
 const wrrf = "BB";
 const staleThreshold = 30;
 
-const localityUrl = "/api/0.1/localities/";
+const localityUrl = "/api/" + apiVersion + "/localities/";
 
 const cacheClient = new CacheClient();
 const localityInfo = await cacheClient.fetchData(localityUrl);
 
 const dailyInfo = localityInfo.find((locality) =>
     locality.name === localityName.daily);
-const dayDataUrl = "/api/0.1/day-data/?locality=" + dailyInfo.pk;
+const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
 const dayData = await cacheClient.fetchData(dayDataUrl);
 
 const wastewaterInfo = localityInfo.find((locality) =>
     locality.name === localityName.wastewater);
 
-const wastewaterUrl = "/api/0.1/wastewater-data/?locality="
+const wastewaterUrl = "/api/" + apiVersion + "/wastewater-data/?locality="
     + wastewaterInfo.pk + "&wrrf_abbreviation=" + wrrf;
 const wastewaterData = await cacheClient.fetchData(wastewaterUrl);
 
-const wastewaterAverageUrl = "/api/0.1/wastewater-averages/?locality="
-    + wastewaterInfo.pk + "&wrrf=" + wrrf;
+const wastewaterAverageUrl = "/api/" + apiVersion
+    + "/wastewater-averages/?locality=" + wastewaterInfo.pk + "&wrrf=" + wrrf;
 const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
 
+const fluSourceInfo = localityInfo.find(locality =>
+    locality.name === locality.fluRsv);
+const documentUrl = "/api/" + apiVersion + "/documents";
+const documentInfo = await cacheClient.fetchData(documentUrl);
+
+const latestDocumentInfo = documentInfo[documentInfo.length -1];
+const fluRsvImageUrl = "/api/" + apiVersion + "/chart-images/"
+    + "?document=" + documentInfo.length;
+const fluRsvImageInfo = await cacheClient.fetchData(fluRsvImageUrl);
+console.log("flu and rsv image info", fluRsvImageInfo);
 
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
@@ -95,12 +108,16 @@ ui.setOutput({
         "latestAverage": document.querySelector("#nyc-wastewater-7day"),
         "wrrf": document.querySelector("#nyc-wrrf")
     },
+    "NYC_Flu_Pdf": {
+        "flu_results": document.querySelector("#nyc-flu-results")
+    },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
     "nycLastMonth": document.querySelectorAll(".last-month"),
     "nycComplete30Begin": document.querySelector("#nyc-30days-begin"),
     "sourceElement": {
         "NYC": document.querySelectorAll(".nyc-source"),
+        "NYC_Flu_Pdf": document.querySelectorAll(".nyc-flu-source"),
         "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source")
     }
 });
@@ -112,6 +129,8 @@ ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
 
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
+
+ui.displayChart(localityName.fluRsv, fluRsvImageInfo[0]);
 
 ui.displaySource(dailyInfo, staleDaily);
 ui.displaySource(wastewaterInfo, staleWastewater);

@@ -99,6 +99,22 @@ export default class Ui {
         });
     }
 
+    displayChart(localityName, chartInfo) {
+        const imageUrl = "/media" + chartInfo.path;
+        const link = document.createElement("a");
+        link.target = "_blank";
+        link.href = imageUrl;
+
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.classList.add("img-fluid");
+
+        link.append(img);
+        this.output[localityName][chartInfo.chart_type].append(
+            link
+        );
+    }
+
     displayLastMonth(lastMonth) {
         this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
         const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;
