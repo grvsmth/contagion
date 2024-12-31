@@ -34,6 +34,11 @@ chartType = {
 
 highlightsBegin = 'Highlights '
 bulletText = '\uf0a8 '
+highlightsEnvelope = {
+    -16777216: '',
+    -4194304: '**',
+    -16744448: '*'
+}
 
 
 class Command(BaseCommand):
@@ -207,9 +212,12 @@ class Command(BaseCommand):
 
                 restOfText = []
                 for span in line['spans'][1:]:
-                    restOfText.append(span.get('text'))
+                    envelope = highlightsEnvelope.get(span.get('color'), '')
+                    restOfText.append(
+                        envelope + span.get('text').strip() + envelope
+                    )
 
-                bullets.append(''.join(restOfText).strip())
+                bullets.append(' '.join(restOfText).strip())
 
         highlights['bullets'] = "\n".join(bullets)
         return highlights

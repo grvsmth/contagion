@@ -116,6 +116,7 @@ ui.setOutput({
     },
     "NYC_Flu_Pdf": {
         "flu_results": document.querySelector("#nyc-flu-results"),
+        "flu_summary": document.querySelector("#nyc-flu-summary"),
         "ili_visits": document.querySelector("#nyc-ili-visits"),
         "pdfInfo": document.querySelectorAll(".nyc-flu-pdf"),
         "rsv_results": document.querySelector("#nyc-rsv-results")

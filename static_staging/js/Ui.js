@@ -148,9 +148,19 @@ export default class Ui {
         );
     }
 
-    static createBullet(bulletText) {
+    static createBullet(bulletMarkdown) {
         const bullet = document.createElement("li");
-        bullet.innerText = bulletText;
+        let bulletHtml = bulletMarkdown.replace(
+            /\*\*(.*)\*\*/,
+            "<span class=\"text-danger\">$1</span>"
+        );
+
+        bulletHtml = bulletHtml.replace(
+            /\*(.*)\*/,
+            "<span class=\"text-success\">$1</span>"
+        );
+
+        bullet.innerHTML = bulletHtml;
         return bullet;
     }
 
@@ -166,7 +176,7 @@ export default class Ui {
         const bullets = highlights[0].bullets.split("\n").map(Ui.createBullet);
         bulletsElement.append(...bullets);
 
-        this.output[localityName].flu_results.append(
+        this.output[localityName].flu_summary.append(
             introElement, bulletsElement
         );
     }
