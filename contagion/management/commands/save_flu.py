@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from json import dumps
 from os import makedirs, path
 
 from django.core.management.base import BaseCommand, CommandError
@@ -29,12 +30,18 @@ chartType = {
     54: 'ili_visits'
 }
 
+highlightsBegin = 'Highlights '
+bulletText = '\uf0a8 '
+
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
 
     fileDateFormat = "%m%d%Y"
     localityName = 'Nyc_Flu_Pdf'
+
+    dateString = ''
+    document = Document()
 
     def add_arguments(self, parser):
         parser.add_argument("--date")
@@ -75,10 +82,10 @@ class Command(BaseCommand):
 
         return locality
 
-    def cacheDocumentMetadata(self, locality, content, dateString):
+    def cacheDocumentMetadata(self, locality, content):
         content['locality'] = locality.pk
         content['publication_date'] = datetime.strptime(
-            dateString, self.fileDateFormat
+            self.dateString, self.fileDateFormat
         )
 
         documentData = DocumentSerializer(data=content)
@@ -101,7 +108,7 @@ class Command(BaseCommand):
             self.fileDateFormat
         )
 
-    def cacheImageMetadata(self, metadata, document):
+    def cacheImageMetadata(self, metadata):
         chartImageData = ChartImageSerializer(data=metadata)
 
         try:
@@ -113,27 +120,18 @@ class Command(BaseCommand):
             pass
 
         chartImageData.is_valid(raise_exception=True)
-        chartImageData.save(document=document)
+        chartImageData.save(document=self.document)
 
-    def extractImages(self, relativeDocumentPath, dateString):
-        documentDate = make_aware(datetime.strptime(
-            dateString, self.fileDateFormat
-        ))
+    def cacheHighlights(self, documentDate, highlights):
+        print(highlights)
 
-        document = Document.objects.get(path=relativeDocumentPath)
-
-        filePath = MEDIA_ROOT + relativeDocumentPath
-        if not path.isfile(filePath):
-            print('Not a file: ' + filePath)
-            exit(1)
-
-        relativePath = FLU_PATH['IMAGE'] + dateString
+    def extractAndSaveImages(self, documentDate, pdfDoc):
+        relativePath = FLU_PATH['IMAGE'] + self.dateString
         savePath = MEDIA_ROOT + relativePath
 
         if not path.exists(savePath):
             makedirs(savePath)
 
-        pdfDoc = pdfOpen(filePath)
         for page in pdfDoc:
             for imageMetadata in page.get_images():
                 xref = imageMetadata[0]
@@ -147,38 +145,81 @@ class Command(BaseCommand):
                 with open(savePath + '/' + outputFilename, 'wb') as fh:
                     fh.write(imageData['image'])
 
-                self.cacheImageMetadata(
-                    {
-                        'document': document.pk,
-                        'end_date': documentDate,
-                        'chart_type': chartType[xref],
-                        'path': relativePath + '/' + outputFilename
-                    },
-                    document
-                )
+                self.cacheImageMetadata({
+                    'document': self.document.pk,
+                    'end_date': documentDate,
+                    'chart_type': chartType[xref],
+                    'path': relativePath + '/' + outputFilename
+                })
+
+    def extractInfo(self, relativeDocumentPath):
+        documentDate = make_aware(datetime.strptime(
+            self.dateString, self.fileDateFormat
+        ))
+
+        self.document = Document.objects.get(path=relativeDocumentPath)
+
+        filePath = MEDIA_ROOT + relativeDocumentPath
+        if not path.isfile(filePath):
+            print('Not a file: ' + filePath)
+            exit(1)
+
+        pdfDoc = pdfOpen(filePath)
+        self.extractAndSaveImages(documentDate, pdfDoc)
+
+        highlights = self.extractHighlights(pdfDoc)
+        print(highlights)
+
+    @staticmethod
+    def extractHighlights(pdfDoc):
+        highlights = {
+            'intro': '',
+            'bullets': []
+        }
+
+        textDict = pdfDoc[0].get_text('dict')
+        for block in textDict['blocks']:
+            if 'image' in block.keys():
+                continue
+
+            for line in block['lines']:
+                if line['spans'][0].get('text', '').startswith(highlightsBegin):
+                    highlights['intro'] = line['spans'][0]['text'].strip()
+                    continue
+
+                if line['spans'][0].get('text') != bulletText:
+                    continue
+
+                restOfText = []
+                for span in line['spans'][1:]:
+                    restOfText.append(span.get('text'))
+
+                highlights['bullets'].append(''.join(restOfText).strip())
+
+        return highlights
 
     def handle(self, *args, **options):
-        dateString = options['date']
+        self.dateString = options['date']
         fromCache = options['from_cache']
 
         locality = self.getLocality(self.localityName)
 
-        if not dateString:
-            dateString = self.guessNextDate(locality)
+        if not self.dateString:
+            self.dateString = self.guessNextDate(locality)
 
         savePath = MEDIA_ROOT + FLU_PATH['PDF']
 
         if not fromCache:
             try:
                 metadata = self.fetchAndSave(
-                    locality.now_url, savePath, FLU_PATH['PDF'], dateString
+                    locality.now_url, savePath, FLU_PATH['PDF']
                 )
             except HTTPError as e:
                 if e.response.status_code != 404:
                     print('Error fetching flu PDF: ' + e.response.reason)
                 return
 
-            self.cacheDocumentMetadata(locality, metadata, dateString)
+            self.cacheDocumentMetadata(locality, metadata)
 
-        saveFileName = FLU_PATH['PDF'] + filePrefix + dateString + '.pdf'
-        self.extractImages(saveFileName, dateString)
+        saveFileName = FLU_PATH['PDF'] + filePrefix + self.dateString + '.pdf'
+        self.extractInfo(saveFileName)
