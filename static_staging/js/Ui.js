@@ -148,6 +148,29 @@ export default class Ui {
         );
     }
 
+    static createBullet(bulletText) {
+        const bullet = document.createElement("li");
+        bullet.innerText = bulletText;
+        return bullet;
+    }
+
+    displayHighlights(localityName, highlights) {
+        if (!highlights) {
+            return;
+        }
+
+        const introElement = document.createElement("h6");
+        introElement.innerText = highlights[0].intro;
+
+        const bulletsElement = document.createElement("ul");
+        const bullets = highlights[0].bullets.split("\n").map(Ui.createBullet);
+        bulletsElement.append(...bullets);
+
+        this.output[localityName].flu_results.append(
+            introElement, bulletsElement
+        );
+    }
+
     displayLastMonth(lastMonth) {
         this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
         const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;

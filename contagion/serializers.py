@@ -4,7 +4,13 @@ from rest_framework.serializers import (
 )
 
 from contagion.models import (
-    ChartImage, Document, Locality, DayData, WastewaterData, WastewaterAverage
+    ChartImage,
+    DayData,
+    Document,
+    HighlightsText,
+    Locality,
+    WastewaterAverage,
+    WastewaterData
 )
 
 class UserSerializer(HyperlinkedModelSerializer):
@@ -114,4 +120,18 @@ class ChartImageSerializer(HyperlinkedModelSerializer):
             'end_date',
             'chart_type',
             'path'
+        ]
+
+
+class HighlightsTextSerializer(HyperlinkedModelSerializer):
+    document = PrimaryKeyRelatedField(
+        queryset=Document.objects.all()
+    )
+
+    class Meta:
+        model = HighlightsText
+        fields = [
+            'document',
+            'intro',
+            'bullets'
         ]

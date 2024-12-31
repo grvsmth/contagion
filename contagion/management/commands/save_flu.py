@@ -12,8 +12,10 @@ from requests.exceptions import HTTPError
 
 from rest_framework.exceptions import ValidationError
 
-from contagion.models import Locality, ChartImage, Document
-from contagion.serializers import DocumentSerializer, ChartImageSerializer
+from contagion.models import ChartImage, Document, HighlightsText, Locality
+from contagion.serializers import (
+    DocumentSerializer, ChartImageSerializer, HighlightsTextSerializer
+)
 from contagion.settings import MEDIA_ROOT, FLU_PATH
 
 # url = "https://www.nyc.gov/assets/doh/downloads/pdf/hcp/weekly-surveillance12142024.pdf"
@@ -122,8 +124,20 @@ class Command(BaseCommand):
         chartImageData.is_valid(raise_exception=True)
         chartImageData.save(document=self.document)
 
-    def cacheHighlights(self, documentDate, highlights):
-        print(highlights)
+    def cacheHighlights(self, highlights):
+        highlights['document'] = self.document.pk
+        highlightsData = HighlightsTextSerializer(data=highlights)
+        print(highlightsData)
+
+        try:
+            highlightsData.instance = HighlightsText.objects.get(
+                document=self.document
+            )
+        except(HighlightsText.DoesNotExist, ValidationError):
+            pass
+
+        highlightsData.is_valid(raise_exception=True)
+        highlightsData.save(document=self.document)
 
     def extractAndSaveImages(self, documentDate, pdfDoc):
         relativePath = FLU_PATH['IMAGE'] + self.dateString
@@ -168,14 +182,15 @@ class Command(BaseCommand):
         self.extractAndSaveImages(documentDate, pdfDoc)
 
         highlights = self.extractHighlights(pdfDoc)
-        print(highlights)
+        self.cacheHighlights(highlights)
 
     @staticmethod
     def extractHighlights(pdfDoc):
         highlights = {
             'intro': '',
-            'bullets': []
+            'bullets': ''
         }
+        bullets = []
 
         textDict = pdfDoc[0].get_text('dict')
         for block in textDict['blocks']:
@@ -194,8 +209,9 @@ class Command(BaseCommand):
                 for span in line['spans'][1:]:
                     restOfText.append(span.get('text'))
 
-                highlights['bullets'].append(''.join(restOfText).strip())
+                bullets.append(''.join(restOfText).strip())
 
+        highlights['bullets'] = "\n".join(bullets)
         return highlights
 
     def handle(self, *args, **options):

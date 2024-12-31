@@ -45,6 +45,10 @@ const fluRsvImageUrl = "/api/" + apiVersion + "/chart-images/"
     + "?document=" + latestDocumentInfo.pk;
 const fluRsvImageInfo = await cacheClient.fetchData(fluRsvImageUrl);
 
+const fluRsvHighlightsUrl = "/api/" + apiVersion + "/highlights-text/"
+    + "?document=" + latestDocumentInfo.pk;
+const fluRsvHighlights = await cacheClient.fetchData(fluRsvHighlightsUrl);
+
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
@@ -138,6 +142,7 @@ ui.displayLatestWastewaterAverage(latestWastewaterAverage);
 fluRsvImageInfo.forEach(chartInfo =>
     ui.displayChart(localityName.fluRsv, chartInfo)
 );
+ui.displayHighlights(localityName.fluRsv, fluRsvHighlights);
 
 ui.displayPdfLinks(localityName.fluRsv, latestDocumentInfo);
 

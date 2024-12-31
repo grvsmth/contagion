@@ -6,7 +6,8 @@ from django.db.models import (
     FloatField,
     ForeignKey,
     IntegerField,
-    Model
+    Model,
+    TextField
     )
 
 class Locality(Model):
@@ -90,3 +91,14 @@ class ChartImage(Model):
     path = CharField("path", max_length=4096)
     chart_type = CharField('Chart type', max_length=32, db_index=True)
     end_date = DateTimeField('end date', db_index=True)
+
+
+class HighlightsText(Model):
+    document = ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name='hightlightsText',
+        on_delete=CASCADE
+    )
+    intro = TextField("intro")
+    bullets = TextField('bullets')

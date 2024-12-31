@@ -4,7 +4,13 @@ from rest_framework import permissions
 from rest_framework.viewsets import ModelViewSet
 
 from contagion.models import (
-    ChartImage, Locality, DayData, Document, WastewaterData, WastewaterAverage
+    ChartImage,
+    DayData,
+    Document,
+    HighlightsText,
+    Locality,
+    WastewaterAverage,
+    WastewaterData
 )
 
 from contagion.serializers import (
@@ -12,6 +18,7 @@ from contagion.serializers import (
     DayDataSerializer,
     DocumentSerializer,
     GroupSerializer,
+    HighlightsTextSerializer,
     LocalitySerializer,
     UserSerializer,
     WastewaterAverageSerializer,
@@ -27,6 +34,11 @@ class DayDataFilter(FilterSet):
     class Meta:
         model = DayData
         fields = ['date_of_interest', 'incomplete', 'locality']
+
+class HighlightsTextFilter(FilterSet):
+    class Meta:
+        model = HighlightsText
+        fields = ['document']
 
 class WastewaterDataFilter(FilterSet):
     class Meta:
@@ -88,6 +100,15 @@ class DocumentViewSet(ModelViewSet):
     """
     queryset = Document.objects.all().order_by('publication_date')
     serializer_class = DocumentSerializer
+
+
+class HighlightsTextViewSet(ModelViewSet):
+    """
+    API endpoint that allows chart image metadata to be viewed or edited.
+    """
+    queryset = HighlightsText.objects.all().order_by('document')
+    serializer_class = HighlightsTextSerializer
+    filterset_class = HighlightsTextFilter
 
 
 class WastewaterDataViewSet(ModelViewSet):

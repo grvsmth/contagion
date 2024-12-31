@@ -23,8 +23,9 @@ from contagion.views import (
     ChartImageViewSet,
     DayDataViewSet,
     DocumentViewSet,
-    UserViewSet,
     GroupViewSet,
+    HighlightsTextViewSet,
+    UserViewSet,
     LocalityViewSet,
     WastewaterAverageViewSet,
     WastewaterDataViewSet,
@@ -35,9 +36,10 @@ router = routers.DefaultRouter()
 router.register(r'chart-images', ChartImageViewSet)
 router.register(r'day-data', DayDataViewSet)
 router.register(r'documents', DocumentViewSet)
-router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
+router.register(r'highlights-text', HighlightsTextViewSet)
 router.register(r'localities', LocalityViewSet)
+router.register(r'users', UserViewSet)
 router.register(r'wastewater-averages', WastewaterAverageViewSet)
 router.register(r'wastewater-data', WastewaterDataViewSet)
 
