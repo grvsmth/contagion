@@ -38,7 +38,7 @@ exports.rangeTotal = function(dayData, filterKey, filterThis, propertyKey) {
     }
 
     if (!('date_of_interest' in rangeData[0])) {
-        console.error('No date_of_interest!', rangeData[0]);
+        console.error('No date_of_interest', rangeData[0]);
         return zeroResult;
     }
 
@@ -58,7 +58,7 @@ exports.isStale = function(thresholdDays, inputDateString) {
 
     const inputDate = new Date(inputDateString);
     if (!(inputDate instanceof Date) || isNaN(inputDate)) {
-        console.log("Invalid input date!", inputDateString)
+        console.log("Invalid input date", inputDateString)
     }
 
     return inputDate <= thresholdDate;
