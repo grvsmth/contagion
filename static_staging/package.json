@@ -23,6 +23,7 @@
   "homepage": "https://github.com/grvsmth/contagion#readme",
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "chart.js": "^4.4.7"
+    "chart.js": "^4.4.7",
+    "luxon": "^3.5.0"
   }
 }

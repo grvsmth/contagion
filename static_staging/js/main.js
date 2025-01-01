@@ -1,3 +1,5 @@
+import { DateTime } from "/static/node_modules/luxon/build/es6/luxon.js";
+
 import CacheClient from "./CacheClient.js";
 import ChartManager from "./ChartManager.js";
 import Ui from "./Ui.js";
@@ -22,7 +24,13 @@ const localityInfo = await cacheClient.fetchData(localityUrl);
 const dailyInfo = localityInfo.find((locality) =>
     locality.name === localityName.daily);
 const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
-const dayData = await cacheClient.fetchData(dayDataUrl);
+
+let dayData = {};
+try {
+    dayData = await cacheClient.fetchData(dayDataUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + daydataUrl, error);
+}
 
 const wastewaterInfo = localityInfo.find((locality) =>
     locality.name === localityName.wastewater);
@@ -54,19 +62,20 @@ const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
 });
 
-const today = new Date();
-const monthThis = {"month": today.getMonth() - 1};
 const deathsLastMonth = compute.rangeTotal(
-    dayData, "isMonth", monthThis, "death_count"
+    dayData,
+    "isLastMonth",
+    {"timezone": dailyInfo.time_zone_name},
+    "death_count"
 );
 
-const endDate = new Date(latestComplete.date_of_interest);
-const complete30Begin = new Date(latestComplete.date_of_interest);
-complete30Begin.setDate(complete30Begin.getDate() - 29);
+const thirtyDayThis = {
+    "days": 30,
+    "endDateString": latestComplete.date_of_interest
+};
 
-const thirtyDayThis = {"beginDate": complete30Begin, "endDate": endDate};
 const deathsThirtyDays = compute.rangeTotal(
-    dayData, "dateRangeFilter", thirtyDayThis, "death_count"
+    dayData, "daysFilter", thirtyDayThis, "death_count"
 );
 
 const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
@@ -135,7 +144,7 @@ ui.setOutput({
 ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
 ui.displayLastMonth(deathsLastMonth);
-ui.displayThirtyDays(deathsThirtyDays, complete30Begin);
+ui.displayThirtyDays(deathsThirtyDays);
 
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
