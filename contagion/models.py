@@ -38,6 +38,25 @@ class DayData(Model):
         on_delete=CASCADE
     )
 
+class RespData(Model):
+    week_ending_date = DateTimeField('week ending date', db_index=True)
+    season = CharField("season", max_length=10)
+
+    mmwr_year = IntegerField()
+    mmwr_week = IntegerField()
+
+    combined_rate = FloatField()
+    covid_rate = FloatField()
+    flu_rate = FloatField()
+    rsv_rate = FloatField()
+
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='respData',
+        on_delete=CASCADE
+    )
+
 class WastewaterData(Model):
     annotation = CharField("annotation", max_length=4096, null=True)
     sample_date = DateTimeField('sample date')

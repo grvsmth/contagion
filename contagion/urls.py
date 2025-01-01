@@ -27,6 +27,7 @@ from contagion.views import (
     HighlightsTextViewSet,
     UserViewSet,
     LocalityViewSet,
+    RespDataViewSet,
     WastewaterAverageViewSet,
     WastewaterDataViewSet,
 )
@@ -39,6 +40,7 @@ router.register(r'documents', DocumentViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'highlights-text', HighlightsTextViewSet)
 router.register(r'localities', LocalityViewSet)
+router.register(r'resp-data', RespDataViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'wastewater-averages', WastewaterAverageViewSet)
 router.register(r'wastewater-data', WastewaterDataViewSet)

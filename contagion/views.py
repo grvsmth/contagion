@@ -9,6 +9,7 @@ from contagion.models import (
     Document,
     HighlightsText,
     Locality,
+    RespData,
     WastewaterAverage,
     WastewaterData
 )
@@ -20,6 +21,7 @@ from contagion.serializers import (
     GroupSerializer,
     HighlightsTextSerializer,
     LocalitySerializer,
+    RespDataSerializer,
     UserSerializer,
     WastewaterAverageSerializer,
     WastewaterDataSerializer
@@ -39,6 +41,11 @@ class HighlightsTextFilter(FilterSet):
     class Meta:
         model = HighlightsText
         fields = ['document']
+
+class RespDataFilter(FilterSet):
+    class Meta:
+        model = RespData
+        fields = ['mmwr_year', 'week_ending_date', 'locality']
 
 class WastewaterDataFilter(FilterSet):
     class Meta:
@@ -94,6 +101,15 @@ class DayDataViewSet(ModelViewSet):
     filterset_class = DayDataFilter
 
 
+class RespDataViewSet(ModelViewSet):
+    """
+    API endpoint that allows RESP-Net data (cases, deaths) to be viewed or edited.
+    """
+    queryset = RespData.objects.all().order_by('week_ending_date')
+    serializer_class = RespDataSerializer
+    filterset_class = RespDataFilter
+
+
 class DocumentViewSet(ModelViewSet):
     """
     API endpoint that allows document metadata to be viewed or edited.
@@ -104,7 +120,7 @@ class DocumentViewSet(ModelViewSet):
 
 class HighlightsTextViewSet(ModelViewSet):
     """
-    API endpoint that allows chart image metadata to be viewed or edited.
+    API endpoint that allows highlights text to be viewed or edited.
     """
     queryset = HighlightsText.objects.all().order_by('document')
     serializer_class = HighlightsTextSerializer
@@ -118,6 +134,7 @@ class WastewaterDataViewSet(ModelViewSet):
     queryset = WastewaterData.objects.all().order_by('sample_date')
     serializer_class = WastewaterDataSerializer
     filterset_class = WastewaterDataFilter
+
 
 class WastewaterAverageViewSet(ModelViewSet):
     """

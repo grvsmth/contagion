@@ -9,20 +9,16 @@ from contagion.models import (
     Document,
     HighlightsText,
     Locality,
+    RespData,
     WastewaterAverage,
     WastewaterData
 )
-
-class UserSerializer(HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
-
 
 class GroupSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
+
 
 class LocalitySerializer(HyperlinkedModelSerializer):
     class Meta:
@@ -57,6 +53,33 @@ class DayDataSerializer(HyperlinkedModelSerializer):
             'incomplete'
         ]
 
+
+class RespDataSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = RespData
+        fields = [
+            'locality',
+            'week_ending_date',
+            'season',
+            'mmwr_year',
+            'mmwr_week',
+            'combined_rate',
+            'covid_rate',
+            'flu_rate',
+            'rsv_rate'
+        ]
+
+
+class UserSerializer(HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'groups']
+
+
 class WastewaterDataSerializer(HyperlinkedModelSerializer):
     locality = PrimaryKeyRelatedField(
         queryset=Locality.objects.all()
@@ -76,6 +99,7 @@ class WastewaterDataSerializer(HyperlinkedModelSerializer):
             'population_served',
             'technology'
         ]
+
 
 class WastewaterAverageSerializer(HyperlinkedModelSerializer):
     locality = PrimaryKeyRelatedField(
