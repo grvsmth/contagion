@@ -29,7 +29,7 @@ let dayData = {};
 try {
     dayData = await cacheClient.fetchData(dayDataUrl);
 } catch (error) {
-    console.log("Error retrieving data from " + daydataUrl, error);
+    console.log("Error retrieving data from " + dayDataUrl, error);
 }
 
 const wastewaterInfo = localityInfo.find((locality) =>
@@ -57,6 +57,15 @@ const fluRsvHighlightsUrl = "/api/" + apiVersion + "/highlights-text/"
     + "?document=" + latestDocumentInfo.pk;
 const fluRsvHighlights = await cacheClient.fetchData(fluRsvHighlightsUrl);
 
+const respDataUrl = "/api/" + apiVersion + "/resp-data/";
+
+let respData = {};
+try {
+    respData = await cacheClient.fetchData(respDataUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + respDataUrl, error);
+}
+
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
@@ -82,6 +91,19 @@ const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
 const latestWastewaterAverage = wastewaterAverageData[
     wastewaterAverageData.length - 1
 ];
+
+let respByStatus = {
+    "complete": {},
+    "latest": {}
+};
+
+if (respData.length) {
+    respByStatus["latest"] = respData[respData.length - 1];
+}
+
+if (respData.length > 3) {
+    respByStatus["complete"] = respData[respData.length - 3];
+}
 
 const staleDaily = compute.isStale(
     staleThreshold, latestComplete.date_of_interest
@@ -130,6 +152,24 @@ ui.setOutput({
         "pdfInfo": document.querySelectorAll(".nyc-flu-pdf"),
         "rsv_results": document.querySelector("#nyc-rsv-results")
     },
+    "respNet": {
+        "results": document.querySelector("#resp-results"),
+        "summary": document.querySelector("#resp-summary"),
+        "complete": {
+            "date": document.querySelector("#resp-complete-date"),
+            "combined": document.querySelector("#resp-complete-combined"),
+            "covid": document.querySelector("#resp-complete-covid"),
+            "flu": document.querySelector("#resp-complete-flu"),
+            "rsv": document.querySelector("#resp-complete-rsv")
+        },
+        "latest": {
+            "date": document.querySelector("#resp-latest-date"),
+            "combined": document.querySelector("#resp-latest-combined"),
+            "covid": document.querySelector("#resp-latest-covid"),
+            "flu": document.querySelector("#resp-latest-flu"),
+            "rsv": document.querySelector("#resp-latest-rsv")
+        }
+    },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
     "nycLastMonth": document.querySelectorAll(".last-month"),
@@ -137,7 +177,8 @@ ui.setOutput({
     "sourceElement": {
         "NYC": document.querySelectorAll(".nyc-source"),
         "NYC_Flu_Pdf": document.querySelectorAll(".nyc-flu-source"),
-        "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source")
+        "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source"),
+        "respNet": document.querySelectorAll(".resp-source")
     }
 });
 
@@ -153,8 +194,11 @@ fluRsvImageInfo.forEach(chartInfo =>
     ui.displayChart(localityName.fluRsv, chartInfo)
 );
 ui.displayHighlights(localityName.fluRsv, fluRsvHighlights);
-
 ui.displayPdfLinks(localityName.fluRsv, latestDocumentInfo);
+
+for (status in respByStatus) {
+    ui.displayRespData(status, respByStatus[status]);
+}
 
 ui.displaySource(dailyInfo, staleDaily);
 ui.displaySource(wastewaterInfo, staleWastewater);

@@ -209,4 +209,19 @@ export default class Ui {
         this.output.nycWastewater.latestAverage.innerText = wastewaterAverage
             .average;
     }
+
+    displayRespData(status, respData) {
+        if (!(status in this.output.respNet)) {
+            console.log("status " + status + " not found in resp output");
+            return;
+        }
+        const output = this.output.respNet[status];
+        const date = new Date(respData.week_ending_date).toLocaleDateString();
+        output.date.innerText = date;
+
+        output.combined.innerText = respData.combined_rate;
+        output.covid.innerText = respData.covid_rate;
+        output.flu.innerText = respData.flu_rate;
+        output.rsv.innerText = respData.rsv_rate;
+    }
 };

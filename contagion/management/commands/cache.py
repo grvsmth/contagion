@@ -249,7 +249,6 @@ class Command(BaseCommand):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
             content = self.fetch(locality.now_url, localityName)
-
             if localityName == 'NYC':
                 self.cacheDayData(locality, content)
 
