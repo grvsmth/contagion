@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from json import dumps
 from os import makedirs, path
 
 from django.core.management.base import BaseCommand, CommandError
@@ -236,7 +235,7 @@ class Command(BaseCommand):
         if not fromCache:
             try:
                 metadata = self.fetchAndSave(
-                    locality.now_url, savePath, FLU_PATH['PDF']
+                    locality.now_url, savePath, FLU_PATH['PDF'], self.dateString
                 )
             except HTTPError as e:
                 if e.response.status_code != 404:
