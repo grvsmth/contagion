@@ -211,11 +211,11 @@ export default class Ui {
     }
 
     displayRespData(status, respData) {
-        if (!(status in this.output.respNet)) {
+        if (!(status in this.output.CDC_RESP_NET)) {
             console.log("status " + status + " not found in resp output");
             return;
         }
-        const output = this.output.respNet[status];
+        const output = this.output.CDC_RESP_NET[status];
         const date = new Date(respData.week_ending_date).toLocaleDateString();
         output.date.innerText = date;
 

@@ -9,6 +9,7 @@ import compute from "./compute.js";
 const localityName = {
     "daily": "NYC",
     "fluRsv": "NYC_Flu_Pdf",
+    "resp": "CDC_RESP_NET",
     "wastewater": "NYC_Wastewater"
 };
 
@@ -92,6 +93,10 @@ const latestWastewaterAverage = wastewaterAverageData[
     wastewaterAverageData.length - 1
 ];
 
+const respInfo = localityInfo.find((locality) =>
+    locality.name === localityName.resp
+);
+
 let respByStatus = {
     "complete": {},
     "latest": {}
@@ -115,6 +120,10 @@ const staleWastewater = compute.isStale(
 
 const staleFlu = compute.isStale(
     staleThreshold, latestDocumentInfo.publication_date
+);
+
+const staleResp = compute.isStale(
+    staleThreshold, respByStatus["complete"].week_ending_date
 );
 
 const ui = new Ui();
@@ -152,7 +161,7 @@ ui.setOutput({
         "pdfInfo": document.querySelectorAll(".nyc-flu-pdf"),
         "rsv_results": document.querySelector("#nyc-rsv-results")
     },
-    "respNet": {
+    "CDC_RESP_NET": {
         "results": document.querySelector("#resp-results"),
         "summary": document.querySelector("#resp-summary"),
         "complete": {
@@ -178,7 +187,7 @@ ui.setOutput({
         "NYC": document.querySelectorAll(".nyc-source"),
         "NYC_Flu_Pdf": document.querySelectorAll(".nyc-flu-source"),
         "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source"),
-        "respNet": document.querySelectorAll(".resp-source")
+        "CDC_RESP_NET": document.querySelectorAll(".resp-source")
     }
 });
 
@@ -203,6 +212,7 @@ for (status in respByStatus) {
 ui.displaySource(dailyInfo, staleDaily);
 ui.displaySource(wastewaterInfo, staleWastewater);
 ui.displaySource(fluSourceInfo, staleFlu);
+ui.displaySource(respInfo, staleResp);
 
 /**
  * Palette via Coolors
