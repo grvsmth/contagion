@@ -165,12 +165,14 @@ export default class Ui {
     }
 
     displayHighlights(localityName, highlights) {
-        if (!highlights) {
+        if (!highlights || highlights === undefined || !highlights.length) {
             return;
         }
 
         const introElement = document.createElement("h6");
-        introElement.innerText = highlights[0].intro;
+        if ("intro" in highlights[0]) {
+            introElement.innerText = highlights[0].intro;
+        }
 
         const bulletsElement = document.createElement("ul");
         const bullets = highlights[0].bullets.split("\n").map(Ui.createBullet);

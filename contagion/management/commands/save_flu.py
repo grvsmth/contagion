@@ -25,14 +25,20 @@ mimeType = {
     'png': 'image/png'
 }
 
-chartType = {
-    37: 'flu_results',
-    44: 'rsv_results',
-    54: 'ili_visits'
+pageChart = {
+    0: {
+        1: 'flu_results'
+    },
+    2: {
+        0: 'rsv_results'
+    },
+    3: {
+        1: 'ili_visits'
+    }
 }
 
 highlightsBegin = 'Highlights '
-bulletText = '\uf0a8 '
+bulletText = '\uf0a8'
 highlightsEnvelope = {
     -16777216: '',
     -4194304: '**',
@@ -131,7 +137,6 @@ class Command(BaseCommand):
     def cacheHighlights(self, highlights):
         highlights['document'] = self.document.pk
         highlightsData = HighlightsTextSerializer(data=highlights)
-        print(highlightsData)
 
         try:
             highlightsData.instance = HighlightsText.objects.get(
@@ -150,15 +155,21 @@ class Command(BaseCommand):
         if not path.exists(savePath):
             makedirs(savePath)
 
-        for page in pdfDoc:
-            for imageMetadata in page.get_images():
+        for (pageNumber, page) in enumerate(pdfDoc):
+            if not pageNumber in pageChart:
+                continue
+
+            for (imageNumber, imageMetadata) in enumerate(page.get_images()):
+                if not imageNumber in pageChart[pageNumber]:
+                    continue
+
                 xref = imageMetadata[0]
 
                 if xref not in chartType:
                     continue
 
                 imageData = pdfDoc.extract_image(xref)
-                outputFilename = chartType[xref] + '.' + imageData['ext']
+                outputFilename = pageChart[pageNumber][imageNumber] + '.' + imageData['ext']
 
                 with open(savePath + '/' + outputFilename, 'wb') as fh:
                     fh.write(imageData['image'])
@@ -202,11 +213,11 @@ class Command(BaseCommand):
                 continue
 
             for line in block['lines']:
-                if line['spans'][0].get('text', '').startswith(highlightsBegin):
+                if line['spans'][0].get('text', '').strip().startswith(highlightsBegin):
                     highlights['intro'] = line['spans'][0]['text'].strip()
                     continue
 
-                if line['spans'][0].get('text') != bulletText:
+                if line['spans'][0].get('text').strip() != bulletText:
                     continue
 
                 restOfText = []
