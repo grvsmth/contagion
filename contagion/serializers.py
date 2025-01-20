@@ -4,19 +4,21 @@ from rest_framework.serializers import (
 )
 
 from contagion.models import (
-    Locality, DayData, WastewaterData, WastewaterAverage
+    ChartImage,
+    DayData,
+    Document,
+    HighlightsText,
+    Locality,
+    RespData,
+    WastewaterAverage,
+    WastewaterData
 )
-
-class UserSerializer(HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
-
 
 class GroupSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
+
 
 class LocalitySerializer(HyperlinkedModelSerializer):
     class Meta:
@@ -51,6 +53,33 @@ class DayDataSerializer(HyperlinkedModelSerializer):
             'incomplete'
         ]
 
+
+class RespDataSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = RespData
+        fields = [
+            'locality',
+            'week_ending_date',
+            'season',
+            'mmwr_year',
+            'mmwr_week',
+            'combined_rate',
+            'covid_rate',
+            'flu_rate',
+            'rsv_rate'
+        ]
+
+
+class UserSerializer(HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'groups']
+
+
 class WastewaterDataSerializer(HyperlinkedModelSerializer):
     locality = PrimaryKeyRelatedField(
         queryset=Locality.objects.all()
@@ -71,6 +100,7 @@ class WastewaterDataSerializer(HyperlinkedModelSerializer):
             'technology'
         ]
 
+
 class WastewaterAverageSerializer(HyperlinkedModelSerializer):
     locality = PrimaryKeyRelatedField(
         queryset=Locality.objects.all()
@@ -83,4 +113,49 @@ class WastewaterAverageSerializer(HyperlinkedModelSerializer):
             'end_date',
             'wrrf',
             'average'
+        ]
+
+class DocumentSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = Document
+        fields = [
+            'locality',
+            'mime_type',
+            'path',
+            'pk',
+            'publication_date',
+            'source_url'
+        ]
+
+
+class ChartImageSerializer(HyperlinkedModelSerializer):
+    document = PrimaryKeyRelatedField(
+        queryset=Document.objects.all()
+    )
+
+    class Meta:
+        model = ChartImage
+        fields = [
+            'document',
+            'end_date',
+            'chart_type',
+            'path'
+        ]
+
+
+class HighlightsTextSerializer(HyperlinkedModelSerializer):
+    document = PrimaryKeyRelatedField(
+        queryset=Document.objects.all()
+    )
+
+    class Meta:
+        model = HighlightsText
+        fields = [
+            'document',
+            'intro',
+            'bullets'
         ]

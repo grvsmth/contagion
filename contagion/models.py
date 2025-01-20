@@ -6,7 +6,8 @@ from django.db.models import (
     FloatField,
     ForeignKey,
     IntegerField,
-    Model
+    Model,
+    TextField
     )
 
 class Locality(Model):
@@ -34,6 +35,25 @@ class DayData(Model):
         Locality,
         verbose_name="locality",
         related_name='dayData',
+        on_delete=CASCADE
+    )
+
+class RespData(Model):
+    week_ending_date = DateTimeField('week ending date', db_index=True)
+    season = CharField("season", max_length=10, db_index=True)
+
+    mmwr_year = IntegerField()
+    mmwr_week = IntegerField()
+
+    combined_rate = FloatField()
+    covid_rate = FloatField()
+    flu_rate = FloatField()
+    rsv_rate = FloatField()
+
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='respData',
         on_delete=CASCADE
     )
 
@@ -65,3 +85,39 @@ class WastewaterAverage(Model):
         related_name='wastewaterAverage',
         on_delete=CASCADE
     )
+
+
+class Document(Model):
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='document',
+        on_delete=CASCADE
+    )
+    mime_type = CharField("MIME type", max_length=128, db_index=True)
+    path = CharField("path", max_length=4096)
+    publication_date = DateTimeField('Publication date', db_index=True)
+    source_url = CharField("path", max_length=4096)
+
+
+class ChartImage(Model):
+    document = ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name='chartImage',
+        on_delete=CASCADE
+    )
+    path = CharField("path", max_length=4096)
+    chart_type = CharField('Chart type', max_length=32, db_index=True)
+    end_date = DateTimeField('end date', db_index=True)
+
+
+class HighlightsText(Model):
+    document = ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name='hightlightsText',
+        on_delete=CASCADE
+    )
+    intro = TextField("intro")
+    bullets = TextField('bullets')

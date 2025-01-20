@@ -13,16 +13,28 @@ from requests import get
 from rest_framework.exceptions import ValidationError
 
 from contagion.models import (
-    DayData, Locality, WastewaterData, WastewaterAverage
+    DayData, Locality, RespData, WastewaterData, WastewaterAverage
 )
 
 from contagion.serializers import (
-    DayDataSerializer, WastewaterDataSerializer, WastewaterAverageSerializer
+    DayDataSerializer,
+    RespDataSerializer,
+    WastewaterDataSerializer,
+    WastewaterAverageSerializer
 )
 
 from contagion.settings import NYC_OPEN_DATA
 
+averageRange = 14
 sortableFormat = '%Y-%m-%d'
+
+networkRate = {
+    "Combined": "combined_rate",
+    "COVID-NET": "covid_rate",
+    "FluSurv-NET": "flu_rate",
+    "RSV-NET": "rsv_rate"
+}
+
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
@@ -113,6 +125,46 @@ class Command(BaseCommand):
             dayData.is_valid(raise_exception=True)
             dayData.save(locality=locality)
 
+    def cacheRespData(self, locality, content):
+        byWeek = {}
+
+        for networkWeek in loads(content):
+            network = networkWeek['surveillance_network']
+            if network not in networkRate:
+                print("Unknown surveillance_network: " + network)
+                continue
+
+            rateKey = networkRate[network]
+            weekEndDate = self.convertDate(networkWeek['_weekenddate'])
+
+            if weekEndDate not in byWeek:
+                byWeek[weekEndDate] = {
+                    'combined_rate': 0.0,
+                    'covid_rate': 0.0,
+                    'flu_rate': 0.0,
+                    'locality': locality.pk,
+                    'mmwr_week': networkWeek['mmwr_week'],
+                    'mmwr_year': networkWeek['mmwr_year'],
+                    'rsv_rate': 0.0,
+                    'season': networkWeek['season'],
+                    'week_ending_date': weekEndDate
+                }
+
+            byWeek[weekEndDate][rateKey] = networkWeek['weekly_rate']
+
+        for week in byWeek.values():
+            respData = RespDataSerializer(data=week)
+
+            try:
+                respData.instance = RespData.objects.get(
+                    week_ending_date=week.get('week_ending_date')
+                )
+            except(RespData.DoesNotExist, ValidationError):
+                pass
+
+            respData.is_valid(raise_exception=True)
+            respData.save(locality=locality)
+
     def cacheWastewaterAverage(self, data, locality):
         averageData = WastewaterAverageSerializer(data=data)
 
@@ -140,12 +192,12 @@ class Command(BaseCommand):
                 copies = []
                 endDate = firstDate + timedelta(day)
 
-                for sampleDay in range(-6,0):
-                    sampleDate = (endDate
-                    + timedelta(sampleDay)).strftime(sortableFormat)
+                for sampleDay in range(1 - averageRange, 1):
+                    sampleDate = endDate + timedelta(sampleDay)
+                    sampleDateString = sampleDate.strftime(sortableFormat)
 
-                    if sampleDate in data:
-                        copies.append(float(data[sampleDate]))
+                    if sampleDateString in data:
+                        copies.append(float(data.get(sampleDateString)))
 
                 if not copies:
                     continue
@@ -197,9 +249,11 @@ class Command(BaseCommand):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
             content = self.fetch(locality.now_url, localityName)
-
             if localityName == 'NYC':
                 self.cacheDayData(locality, content)
+
+            if localityName == 'CDC_RESP_NET':
+                self.cacheRespData(locality, content)
 
             if localityName == 'NYC_Wastewater':
                 self.cacheWastewater(locality, content)

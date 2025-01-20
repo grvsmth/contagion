@@ -7,6 +7,7 @@
  */
 const population = 11996161;
 const lakh = 100000;
+const mediaRoot = "/media";
 
 export default class Ui {
     constructor() {
@@ -99,6 +100,89 @@ export default class Ui {
         });
     }
 
+    displayChart(localityName, chartInfo) {
+        if (!(chartInfo.chart_type in this.output[localityName])) {
+            return;
+        }
+
+        const imageUrl = "/media" + chartInfo.path;
+        const link = document.createElement("a");
+        link.target = "_blank";
+        link.href = imageUrl;
+
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.classList.add("img-fluid");
+
+        link.append(img);
+        this.output[localityName][chartInfo.chart_type].append(
+            link
+        );
+    }
+
+    displayPdfLink(element, documentInfo) {
+        const originalLink = document.createElement("a");
+        originalLink.target = "_blank";
+        originalLink.href = documentInfo.source_url;
+        originalLink.innerText = "source";
+
+        const cacheLink = document.createElement("a");
+        cacheLink.target = "_blank";
+        cacheLink.href = mediaRoot + documentInfo.path;
+        cacheLink.innerText = "cache";
+
+        const items = [
+            new Text("Source PDF ("),
+            originalLink,
+            new Text(") ("),
+            cacheLink,
+            new Text(")")
+        ];
+
+        element.append(...items);
+    }
+
+    displayPdfLinks(localityName, documentInfo) {
+        this.output[localityName].pdfInfo.forEach(element =>
+            this.displayPdfLink(element, documentInfo)
+        );
+    }
+
+    static createBullet(bulletMarkdown) {
+        const bullet = document.createElement("li");
+        let bulletHtml = bulletMarkdown.replace(
+            /\*\*(.*)\*\*/,
+            "<span class=\"text-danger\">$1</span>"
+        );
+
+        bulletHtml = bulletHtml.replace(
+            /\*(.*)\*/,
+            "<span class=\"text-success\">$1</span>"
+        );
+
+        bullet.innerHTML = bulletHtml;
+        return bullet;
+    }
+
+    displayHighlights(localityName, highlights) {
+        if (!highlights || highlights === undefined || !highlights.length) {
+            return;
+        }
+
+        const introElement = document.createElement("h6");
+        if ("intro" in highlights[0]) {
+            introElement.innerText = highlights[0].intro;
+        }
+
+        const bulletsElement = document.createElement("ul");
+        const bullets = highlights[0].bullets.split("\n").map(Ui.createBullet);
+        bulletsElement.append(...bullets);
+
+        this.output[localityName].flu_summary.append(
+            introElement, bulletsElement
+        );
+    }
+
     displayLastMonth(lastMonth) {
         this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
         const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;
@@ -108,10 +192,9 @@ export default class Ui {
         });
     }
 
-    displayThirtyDays(thirtyDays, beginDate) {
+    displayThirtyDays(thirtyDays) {
         this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
-        this.output.nycComplete30Begin.innerText = beginDate
-            .toLocaleDateString();
+        this.output.nycComplete30Begin.innerText = thirtyDays.beginDate;
     }
 
     displayLatestWastewaterData(wastewaterData) {
@@ -127,5 +210,20 @@ export default class Ui {
     displayLatestWastewaterAverage(wastewaterAverage) {
         this.output.nycWastewater.latestAverage.innerText = wastewaterAverage
             .average;
+    }
+
+    displayRespData(status, respData) {
+        if (!(status in this.output.CDC_RESP_NET)) {
+            console.log("status " + status + " not found in resp output");
+            return;
+        }
+        const output = this.output.CDC_RESP_NET[status];
+        const date = new Date(respData.week_ending_date).toLocaleDateString();
+        output.date.innerText = date;
+
+        output.combined.innerText = respData.combined_rate.toFixed(1);
+        output.covid.innerText = respData.covid_rate.toFixed(1);
+        output.flu.innerText = respData.flu_rate.toFixed(1);
+        output.rsv.innerText = respData.rsv_rate.toFixed(1);
     }
 };
