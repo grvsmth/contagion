@@ -221,9 +221,9 @@ export default class Ui {
         const date = new Date(respData.week_ending_date).toLocaleDateString();
         output.date.innerText = date;
 
-        output.combined.innerText = respData.combined_rate;
-        output.covid.innerText = respData.covid_rate;
-        output.flu.innerText = respData.flu_rate;
-        output.rsv.innerText = respData.rsv_rate;
+        output.combined.innerText = respData.combined_rate.toFixed(1);
+        output.covid.innerText = respData.covid_rate.toFixed(1);
+        output.flu.innerText = respData.flu_rate.toFixed(1);
+        output.rsv.innerText = respData.rsv_rate.toFixed(1);
     }
 };
