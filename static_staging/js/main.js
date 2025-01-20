@@ -231,6 +231,9 @@ chartManager.displayData({
     "chartType": "line",
     "element": document.querySelector("#nyc-hosp-chart"),
     "labels": dayLabels,
+    "legend": {
+        "display": false
+    },
     "title": "Hospitalizations per day (7-day average)",
     "datasets": [{
         "backgroundColor": "#5F0F40",
@@ -242,6 +245,9 @@ chartManager.displayData({
     "chartType": "line",
     "element": document.querySelector("#nyc-cases-chart"),
     "labels": dayLabels,
+    "legend": {
+        "display": false
+    },
     "title": "Cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
@@ -253,6 +259,9 @@ chartManager.displayData({
     "chartType": "bar",
     "element": document.querySelector("#nyc-deaths-chart"),
     "labels": dayLabels,
+    "legend": {
+        "display": false
+    },
     "title": "Deaths per day",
     "datasets": [{
         "backgroundColor": "#FB8B24",
@@ -265,6 +274,9 @@ chartManager.displayData({
     "labels": wastewaterAverageData.map(row =>
         chartManager.formatDate(row.end_date)
     ),
+    "legend": {
+        "display": false
+    },
     "title": "Wastewater two-week averages",
     "datasets": [{
         "backgroundColor": "#E36414",
@@ -278,11 +290,34 @@ chartManager.displayData({
     "labels": respData.map(row =>
         chartManager.formatDate(row.week_ending_date)
     ),
+    "legend": {
+        "display": true,
+        "position": "right"
+    },
     "title": "Hospitalizations per lakh in the United States from CDC RESP-NET",
     "datasets": [
         {
             "backgroundColor": "#E36414",
             "data": respData.map(row => row.combined_rate),
+            "label": "Combined",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#FB8B24",
+            "data": respData.map(row => row.covid_rate),
+            "label": "COVID-19",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#9A031E",
+            "data": respData.map(row => row.flu_rate),
+            "label": "Influenza",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#5F0F40",
+            "data": respData.map(row => row.rsv_rate),
+            "label": "RSV",
             "type": "line"
         }
     ]

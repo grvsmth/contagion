@@ -13,20 +13,24 @@ export default class ChartManager {
     }
 
     displayData(config) {
+        const options = {
+            "plugins": {
+                "legend": config.legend,
+                "title": {
+                    "display": true,
+                    "text": config.title
+                }
+            }
+        };
+
+        if ("additionalOptions" in config) {
+            Object.assign(options, config.additionalOptions);
+        }
+
         new Chart (
             config.element,
             {
-                "options": {
-                    "plugins": {
-                        "legend": {
-                            "display": false
-                        },
-                        "title": {
-                            "display": true,
-                            "text": config.title
-                        }
-                    }
-                },
+                "options": options,
                 "type": config.chartType,
                 "data": {
                     "labels": config.labels,
