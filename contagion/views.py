@@ -45,7 +45,7 @@ class HighlightsTextFilter(FilterSet):
 class RespDataFilter(FilterSet):
     class Meta:
         model = RespData
-        fields = ['mmwr_year', 'week_ending_date', 'locality']
+        fields = ['mmwr_year', 'season', 'week_ending_date', 'locality']
 
 class WastewaterDataFilter(FilterSet):
     class Meta:

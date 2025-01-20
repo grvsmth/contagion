@@ -27,7 +27,7 @@ mimeType = {
 
 pageChart = {
     0: {
-        1: 'flu_results'
+        0: 'flu_results'
     },
     2: {
         0: 'rsv_results'
@@ -165,11 +165,9 @@ class Command(BaseCommand):
 
                 xref = imageMetadata[0]
 
-                if xref not in chartType:
-                    continue
-
                 imageData = pdfDoc.extract_image(xref)
-                outputFilename = pageChart[pageNumber][imageNumber] + '.' + imageData['ext']
+                chartType = pageChart[pageNumber][imageNumber]
+                outputFilename = chartType  + '.' + imageData['ext']
 
                 with open(savePath + '/' + outputFilename, 'wb') as fh:
                     fh.write(imageData['image'])
@@ -177,7 +175,7 @@ class Command(BaseCommand):
                 self.cacheImageMetadata({
                     'document': self.document.pk,
                     'end_date': documentDate,
-                    'chart_type': chartType[xref],
+                    'chart_type': chartType,
                     'path': relativePath + '/' + outputFilename
                 })
 

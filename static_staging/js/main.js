@@ -58,7 +58,7 @@ const fluRsvHighlightsUrl = "/api/" + apiVersion + "/highlights-text/"
     + "?document=" + latestDocumentInfo.pk;
 const fluRsvHighlights = await cacheClient.fetchData(fluRsvHighlightsUrl);
 
-const respDataUrl = "/api/" + apiVersion + "/resp-data/";
+const respDataUrl = "/api/" + apiVersion + "/resp-data/?season=2024-25";
 
 let respData = {};
 try {
@@ -66,6 +66,9 @@ try {
 } catch (error) {
     console.log("Error retrieving data from " + respDataUrl, error);
 }
+
+console.log("respData", respData);
+
 
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
@@ -268,4 +271,19 @@ chartManager.displayData({
         "data": wastewaterAverageData.map(row => row.average),
         "type": "line"
     }]
+});
+
+chartManager.displayData({
+    "element": document.querySelector("#resp-chart"),
+    "labels": respData.map(row =>
+        chartManager.formatDate(row.week_ending_date)
+    ),
+    "title": "Hospitalizations per lakh in the United States from CDC RESP-NET",
+    "datasets": [
+        {
+            "backgroundColor": "#E36414",
+            "data": respData.map(row => row.combined_rate),
+            "type": "line"
+        }
+    ]
 });

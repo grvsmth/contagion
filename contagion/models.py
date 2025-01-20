@@ -40,7 +40,7 @@ class DayData(Model):
 
 class RespData(Model):
     week_ending_date = DateTimeField('week ending date', db_index=True)
-    season = CharField("season", max_length=10)
+    season = CharField("season", max_length=10, db_index=True)
 
     mmwr_year = IntegerField()
     mmwr_week = IntegerField()
