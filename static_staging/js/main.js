@@ -198,10 +198,10 @@ ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
-
+/*
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
-
+*/
 fluRsvImageInfo.forEach(chartInfo =>
     ui.displayChart(localityName.fluRsv, chartInfo)
 );
@@ -268,7 +268,7 @@ chartManager.displayData({
         "data": dayData.map(row => row.death_count)
     }]
 });
-
+/*
 chartManager.displayData({
     "element": document.querySelector("#nyc-wastewater-chart"),
     "labels": wastewaterAverageData.map(row =>
@@ -284,7 +284,7 @@ chartManager.displayData({
         "type": "line"
     }]
 });
-
+*/
 chartManager.displayData({
     "element": document.querySelector("#resp-chart"),
     "labels": respData.map(row =>
