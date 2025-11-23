@@ -115,6 +115,90 @@
                     </div>
                 </div>
             </div>
+            <div class="row row-cols-1 row-cols-md-2 py-2">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <div>
+                                <canvas id="nyc-deaths-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                Most recent 7-day average:
+                                (<span class="nyc-latest-date"></span>):
+                                <span id="nyc-death-7day"></span>
+                            </p>
+                            <p class="card-text">
+                                Most recent complete 7-day average:
+                                (<span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-7day-complete"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent month:
+                                (<span class="last-month"></span>):
+                                <span id="nyc-death-last-month"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent 30 days with
+                                complete data
+                                (<span id="nyc-30days-begin"></span> -
+                                <span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-30days"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">
+                                COVID, flu and RSV hospitalizations 7-day average
+                                per lakh in the US
+                            </h5>
+                            <div>
+                                <canvas id="resp-chart"></canvas>
+                            </div>
+                            <table class="card-text table">
+                                <thead>
+                                    <th></th>
+                                    <th id="resp-complete-date"></th>
+                                    <th id="resp-latest-date"></th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Combined</th>
+                                        <td id="resp-complete-combined"></td>
+                                        <td id="resp-latest-combined"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>COVID</th>
+                                        <td id="resp-complete-covid"></td>
+                                        <td id="resp-latest-covid"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Flu</th>
+                                        <td id="resp-complete-flu"></td>
+                                        <td id="resp-latest-flu"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>RSV</th>
+                                        <td id="resp-complete-rsv"></td>
+                                        <td id="resp-latest-rsv"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p class="card-text" id="resp-summary">
+                            </p>
+                        </div>
+                        <div class="card-footer resp-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row row-cols-1 py-2">
                 <div class="col">
                     <div class="card">
@@ -126,16 +210,16 @@
     <noscript>
         <a href='https://public.tableau.com/app/profile/new.york.state.department.of.health/viz/WWS_Tracker_Public/wws_trend'>
             <img alt='wws_trend'
-            src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Y8&#47;Y845XFNDZ&#47;1.png'
+            src='https://public.tableau.com/shared/4Y2KS3Q6F?:display_count=n&:origin=viz_share_link'
             style='border: none' />
         </a>
     </noscript>
     <object class='tableauViz img-fluid'  style='display:none;'>
         <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
         <param name='embed_code_version' value='3' />
-        <param name='path' value='shared&#47;Y845XFNDZ' />
+        <param name='path' value='shared&#47;4Y2KS3Q6F' />
         <param name='toolbar' value='yes' />
-        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Y8&#47;Y845XFNDZ&#47;1.png' />
+        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Y8&#47;4Y2KS3Q6F&#47;1.png' />
         <param name='animate_transition' value='yes' />
         <param name='display_static_image' value='yes' />
         <param name='display_spinner' value='yes' />
@@ -201,41 +285,6 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">COVID Deaths in NYC</h5>
-                            <div>
-                                <canvas id="nyc-deaths-chart"></canvas>
-                            </div>
-                            <p class="card-text">
-                                Most recent 7-day average:
-                                (<span class="nyc-latest-date"></span>):
-                                <span id="nyc-death-7day"></span>
-                            </p>
-                            <p class="card-text">
-                                Most recent complete 7-day average:
-                                (<span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-7day-complete"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent month:
-                                (<span class="last-month"></span>):
-                                <span id="nyc-death-last-month"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent 30 days with
-                                complete data
-                                (<span id="nyc-30days-begin"></span> -
-                                <span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-30days"></span>
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
                             <h5 class="card=title">
                                 Outpatient influenza-like illness visits in NYC
                             </h5>
@@ -245,55 +294,6 @@
                             </p>
                         </div>
                         <div class="card-footer nyc-flu-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-md-2 py-2">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                COVID, flu and RSV hospitalizations 7-day average
-                                per lakh in the US
-                            </h5>
-                            <div>
-                                <canvas id="resp-chart"></canvas>
-                            </div>
-                            <table class="card-text table">
-                                <thead>
-                                    <th></th>
-                                    <th id="resp-complete-date"></th>
-                                    <th id="resp-latest-date"></th>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>Combined</th>
-                                        <td id="resp-complete-combined"></td>
-                                        <td id="resp-latest-combined"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>COVID</th>
-                                        <td id="resp-complete-covid"></td>
-                                        <td id="resp-latest-covid"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Flu</th>
-                                        <td id="resp-complete-flu"></td>
-                                        <td id="resp-latest-flu"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>RSV</th>
-                                        <td id="resp-complete-rsv"></td>
-                                        <td id="resp-latest-rsv"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <p class="card-text" id="resp-summary">
-                            </p>
-                        </div>
-                        <div class="card-footer resp-source">
                             <h5 class="card-title">Source</h5>
                         </div>
                     </div>

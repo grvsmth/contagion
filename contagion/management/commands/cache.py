@@ -83,6 +83,29 @@ class Command(BaseCommand):
 
         return dayDict
 
+    @classmethod
+    def convertWeekData(cls, locality, row, metricMap):
+        dayDict = {key.lower(): value for key, value in row.items()}
+
+        column = metricMap.get(row['metric'])
+        if not column:
+            return
+
+        dayDict[column] = row['value']
+        (month, day, year) = row['date'].split('/')
+        inputDatetime = datetime(
+            int(year),
+            int(month),
+            int(day),
+            tzinfo=ZoneInfo(locality.time_zone_name)
+        )
+        dayDict['date_of_interest'] = str(inputDatetime)
+
+        dayDict['locality'] = locality.pk
+        dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
+
+        return dayDict
+
     def convertWastewater(self, locality, row):
         data = deepcopy(row)
 
