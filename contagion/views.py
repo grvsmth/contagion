@@ -11,11 +11,13 @@ from contagion.models import (
     Locality,
     RespData,
     WastewaterAverage,
-    WastewaterData
+    WastewaterData,
+    WeekData
 )
 
 from contagion.serializers import (
     ChartImageSerializer,
+    WeekDataSerializer,
     DayDataSerializer,
     DocumentSerializer,
     GroupSerializer,
@@ -36,6 +38,11 @@ class DayDataFilter(FilterSet):
     class Meta:
         model = DayData
         fields = ['date_of_interest', 'incomplete', 'locality']
+
+class WeekDataFilter(FilterSet):
+    class Meta:
+        model = WeekData
+        fields = ['date', 'locality']
 
 class HighlightsTextFilter(FilterSet):
     class Meta:
@@ -100,6 +107,14 @@ class DayDataViewSet(ModelViewSet):
     serializer_class = DayDataSerializer
     filterset_class = DayDataFilter
 
+
+class WeekDataViewSet(ModelViewSet):
+    """
+    API endpoint that allows weekly data (cases, deaths) to be viewed or edited.
+    """
+    queryset = WeekData.objects.all().order_by('date')
+    serializer_class = WeekDataSerializer
+    filterset_class = WeekDataFilter
 
 class RespDataViewSet(ModelViewSet):
     """

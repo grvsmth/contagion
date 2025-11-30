@@ -38,6 +38,17 @@ class DayData(Model):
         on_delete=CASCADE
     )
 
+class WeekData(Model):
+    date = DateTimeField('date', unique=True)
+    value = IntegerField()
+
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='weekData',
+        on_delete=CASCADE
+    )
+
 class RespData(Model):
     week_ending_date = DateTimeField('week ending date', db_index=True)
     season = CharField("season", max_length=10, db_index=True)

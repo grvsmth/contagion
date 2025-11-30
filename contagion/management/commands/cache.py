@@ -13,14 +13,14 @@ from requests import get
 from rest_framework.exceptions import ValidationError
 
 from contagion.models import (
-    DayData, Locality, RespData, WastewaterData, WastewaterAverage
+    Locality, RespData, WastewaterData, WastewaterAverage, WeekData
 )
 
 from contagion.serializers import (
-    DayDataSerializer,
     RespDataSerializer,
     WastewaterDataSerializer,
-    WastewaterAverageSerializer
+    WastewaterAverageSerializer,
+    WeekDataSerializer
 )
 
 from contagion.settings import NYC_OPEN_DATA
@@ -66,32 +66,9 @@ class Command(BaseCommand):
         return inputDatetime.strftime(sortableFormat)
 
     @classmethod
-    def convertDayData(cls, locality, row):
-        dayDict = {key.lower(): value for key, value in row.items()}
+    def convertWeekData(cls, locality, row):
+        weekDict = {key.lower(): value for key, value in row.items()}
 
-        (month, day, year) = row['date_of_interest'].split('/')
-        inputDatetime = datetime(
-            int(year),
-            int(month),
-            int(day),
-            tzinfo=ZoneInfo(locality.time_zone_name)
-        )
-        dayDict['date_of_interest'] = str(inputDatetime)
-
-        dayDict['locality'] = locality.pk
-        dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
-
-        return dayDict
-
-    @classmethod
-    def convertWeekData(cls, locality, row, metricMap):
-        dayDict = {key.lower(): value for key, value in row.items()}
-
-        column = metricMap.get(row['metric'])
-        if not column:
-            return
-
-        dayDict[column] = row['value']
         (month, day, year) = row['date'].split('/')
         inputDatetime = datetime(
             int(year),
@@ -99,12 +76,11 @@ class Command(BaseCommand):
             int(day),
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
-        dayDict['date_of_interest'] = str(inputDatetime)
 
-        dayDict['locality'] = locality.pk
-        dayDict['incomplete'] = int(row['INCOMPLETE']) > 0
+        weekDict['date'] = str(inputDatetime)
+        weekDict['locality'] = locality.pk
 
-        return dayDict
+        return weekDict
 
     def convertWastewater(self, locality, row):
         data = deepcopy(row)
@@ -130,23 +106,23 @@ class Command(BaseCommand):
 
         return data
 
-    def cacheDayData(self, locality, content):
+    def cacheWeekData(self, locality, content):
         cr = DictReader(content.splitlines())
         for row in cr:
-            dayDict = self.convertDayData(locality, row)
+            weekDict = self.convertWeekData(locality, row)
 
             # https://stackoverflow.com/questions/37833307/django-rest-framework-post-update-if-existing-or-create
-            dayData = DayDataSerializer(data=dayDict)
+            weekData = WeekDataSerializer(data=weekDict)
 
             try:
-                dayData.instance = DayData.objects.get(
-                    date_of_interest=dayDict.get('date_of_interest')
+                weekData.instance = WeekData.objects.get(
+                    date=weekDict.get('date_of_interest')
                 )
-            except(DayData.DoesNotExist, ValidationError):
+            except(WeekData.DoesNotExist, ValidationError):
                 pass
 
-            dayData.is_valid(raise_exception=True)
-            dayData.save(locality=locality)
+            weekData.is_valid(raise_exception=True)
+            weekData.save(locality=locality)
 
     def cacheRespData(self, locality, content):
         byWeek = {}
@@ -272,8 +248,8 @@ class Command(BaseCommand):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
             content = self.fetch(locality.now_url, localityName)
-            if localityName == 'NYC':
-                self.cacheDayData(locality, content)
+            if localityName == 'NYC_Cases':
+                self.cacheWeekData(locality, content)
 
             if localityName == 'CDC_RESP_NET':
                 self.cacheRespData(locality, content)
