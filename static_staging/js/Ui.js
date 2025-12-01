@@ -52,7 +52,7 @@ export default class Ui {
             Ui.perLakh(avg7day);
 
         const latestDate = new Date(data.date);
-        this.output.nycLatestDate.forEach((element) => {
+        this.output.nycLatestWeek.forEach((element) => {
             element.innerText = latestDate.toLocaleDateString();
         });
     }
@@ -67,7 +67,7 @@ export default class Ui {
             Ui.perLakh(avg7day);
 
         const latestCompleteDate = new Date(data.date);
-        this.output.nycCompleteDate.forEach((element) => {
+        this.output.nycCompleteWeek.forEach((element) => {
             element.innerText = latestCompleteDate.toLocaleDateString();
         });
     }

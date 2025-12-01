@@ -188,6 +188,8 @@ ui.setOutput({
     },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
+    "nycLatestWeek": document.querySelectorAll(".nyc-latest-week"),
+    "nycCompleteWeek": document.querySelectorAll(".nyc-complete-week"),
     "nycLastMonth": document.querySelectorAll(".last-month"),
     "nycComplete30Begin": document.querySelector("#nyc-30days-begin"),
     "sourceElement": {
