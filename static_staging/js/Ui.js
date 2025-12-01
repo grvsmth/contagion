@@ -45,14 +45,30 @@ export default class Ui {
     displayWeeklyData(data) {
         console.log("displayWeeklyData", data);
 
-        this.output.nycWeeklyCases.sevenDayAverage.innerText =
-            data.all_case_count_7day_avg;
+        const avg7day = Math.round(data.value / 7);
+
+        this.output.nycWeeklyCases.sevenDayAverage.innerText = avg7day;
         this.output.nycWeeklyCases.sevenDayPerLakh.innerText =
-            Ui.perLakh(data.all_case_count_7day_avg);
+            Ui.perLakh(avg7day);
 
         const latestDate = new Date(data.date);
         this.output.nycLatestDate.forEach((element) => {
             element.innerText = latestDate.toLocaleDateString();
+        });
+    }
+
+    displayCompleteWeeklyData(data) {
+        console.log("displayCompleteWeeklyData", data);
+
+        const avg7day = Math.round(data.value / 7);
+
+        this.output.nycWeeklyCases.sevenDayComplete.innerText = avg7day;
+        this.output.nycWeeklyCases.sevenDayCompletePerLakh.innerText =
+            Ui.perLakh(avg7day);
+
+        const latestCompleteDate = new Date(data.date);
+        this.output.nycCompleteDate.forEach((element) => {
+            element.innerText = latestCompleteDate.toLocaleDateString();
         });
     }
 

@@ -16,6 +16,7 @@ const localityName = {
 const apiVersion = 0.1;
 const wrrf = "BB";
 const staleThreshold = 30;
+const completeDelay = 2;
 
 const localityUrl = "/api/" + apiVersion + "/localities/";
 
@@ -71,9 +72,7 @@ const latestComplete = dayData.findLast((dayInfo) => {
 });
 
 const latestWeekData = weekData[weekData.length - 1];
-const latestCompleteWeek = weekData.findLast((weekInfo) => {
-    return !weekInfo.incomplete;
-});
+const latestCompleteWeek = weekData[weekData.length - (completeDelay + 1)];
 
 const deathsLastMonth = compute.rangeTotal(
     dayData,
@@ -203,7 +202,7 @@ ui.setOutput({
 ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
 ui.displayWeeklyData(latestWeekData);
-// ui.displayCompleteData(latestComplete);
+ui.displayCompleteWeeklyData(latestCompleteWeek);
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
 
