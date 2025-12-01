@@ -40,7 +40,6 @@ try {
 let weekData = {};
 try {
     weekData = await cacheClient.fetchData(weekDataUrl);
-    console.log("weekData", weekData);
 } catch (error) {
     console.log("Error retrieving data from " + weekDataUrl, error);
 }
@@ -228,6 +227,8 @@ const dayLabels = dayData.map(row =>
     chartManager.formatDate(row.date_of_interest)
 );
 
+const weekLabels = weekData.map(row => chartManager.formatDate(row.date));
+
 chartManager.displayData({
     "chartType": "line",
     "element": document.querySelector("#nyc-hosp-chart"),
@@ -241,7 +242,7 @@ chartManager.displayData({
         "data": dayData.map(row => row.hosp_count_7day_avg)
     }]
 });
-/*
+
 chartManager.displayData({
     "chartType": "line",
     "element": document.querySelector("#nyc-week-cases-chart"),
@@ -249,13 +250,13 @@ chartManager.displayData({
     "legend": {
         "display": false
     },
-    "title": "Cases per day (7-day average, confirmed and probable)",
+    "title": "Cases per week (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
-        "data": weekData.map(row => row.value)
+        "data": weekData.map(row => Math.round(row.value / 7))
     }]
 });
-*/
+
 chartManager.displayData({
     "chartType": "bar",
     "element": document.querySelector("#nyc-deaths-chart"),
