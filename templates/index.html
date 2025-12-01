@@ -45,71 +45,36 @@
         <div class="container">
             <div class="row row-cols-1 row-cols-md-2 py-2">
                 <div class="col">
-                    <div class="card" id="nyc-hosp">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                COVID Hospitalizations in NYC
-                            </h5>
-                            <div>
-                                <canvas id="nyc-hosp-chart"></canvas>
-                            </div>
-                            <p class="card-text">
-                                <strong>Most recent 7-day average</strong>
-                                (<span class="nyc-latest-date"></span>):
-                                <br />
-                                Citywide: <span id="nyc-hosp-7day"></span>,
-                                Per <a href="https://en.wikipedia.org/wiki/Lakh"
-                                    target="_blank">lakh</a>:
-                                <span id="nyc-hosp-7day-lakh"></span>
-                            </p>
-                            <p class="card-text">
-                                <strong>
-                                    Most recent complete 7-day average
-                                    </strong>
-                                (<span class="nyc-complete-date"></span>):
-                                <br />
-                                Citywide:
-                                <span id="nyc-hosp-7day-complete"></span>,
-                                Per lakh:
-                                <span id="nyc-hosp-7day-complete-lakh"></span>
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card=title">COVID Cases in NYC</h5>
                             <div>
-                                <canvas id="nyc-cases-chart"></canvas>
+                                <canvas id="nyc-week-cases-chart"></canvas>
                             </div>
                             <p class="card-text">
                                 <strong>
                                     Most recent 7-day average:
                                 </strong>
-                                (<span class="nyc-latest-date"></span>):
+                                (<span class="nyc-latest-week"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-7day"></span>,
+                                <span id="nyc-cases-week"></span>,
                                 Per lakh:
-                                <span id="nyc-cases-7day-lakh"></span>
+                                <span id="nyc-cases-week-lakh"></span>
                             </p>
                             <p class="card-text">
                                 <strong>
                                     Most recent complete 7-day average:
                                 </strong>
-                                (<span class="nyc-complete-date"></span>):
+                                (<span class="nyc-complete-week"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-7day-complete"></span>,
+                                <span id="nyc-cases-week-complete"></span>,
                                 Per lakh:
-                                <span id="nyc-cases-7day-complete-lakh"></span>
+                                <span id="nyc-cases-week-complete-lakh"></span>
                             </p>
                         </div>
-                        <div class="card-footer nyc-source">
+                        <div class="card-footer nyc-week-source">
                             <h5 class="card-title">Source</h5>
                         </div>
                     </div>
@@ -199,67 +164,38 @@
                     </div>
                 </div>
             </div>
-            <div class="row row-cols-1 py-2">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                COVID Wastewater concentration in NYC
-                            </h5>
-<div class='tableauPlaceholder' id='viz1735570512931'>
-    <noscript>
-        <a href='https://public.tableau.com/app/profile/new.york.state.department.of.health/viz/WWS_Tracker_Public/wws_trend'>
-            <img alt='wws_trend'
-            src='https://public.tableau.com/shared/4Y2KS3Q6F?:display_count=n&:origin=viz_share_link'
-            style='border: none' />
-        </a>
-    </noscript>
-    <object class='tableauViz img-fluid'  style='display:none;'>
-        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
-        <param name='embed_code_version' value='3' />
-        <param name='path' value='shared&#47;4Y2KS3Q6F' />
-        <param name='toolbar' value='yes' />
-        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Y8&#47;4Y2KS3Q6F&#47;1.png' />
-        <param name='animate_transition' value='yes' />
-        <param name='display_static_image' value='yes' />
-        <param name='display_spinner' value='yes' />
-        <param name='display_overlay' value='yes' />
-        <param name='display_count' value='yes' />
-        <param name='language' value='en-US' />
-    </object>
-</div>
-                            <p class="card-text">
-
-                            </p>
-                        </div>
-                        <div class="card-footer nys-wastewater-source">
-                            <h5 class="card-title">Source</h5>
-                            <p class="card-text">
-                                <a href="https://coronavirus.health.ny.gov/covid-19-wastewater-surveillance"
-                                    target="_blank">New York State Department of
-                                    Health</a>
-                                (<a href="https://public.tableau.com/app/profile/new.york.state.department.of.health/viz/shared/54CYR2C5S"
-                                    target="_blank">open in a new window</a>)
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="row row-cols-1 row-cols-md-2 py-2">
                 <div class="col">
-                    <div class="card">
+                    <div class="card" id="nyc-hosp">
                         <div class="card-body">
                             <h5 class="card=title">
-                                Influenza positive test results in NYC
+                                COVID Hospitalizations in NYC
                             </h5>
-                            <div id="nyc-flu-results">
+                            <div>
+                                <canvas id="nyc-hosp-chart"></canvas>
                             </div>
-                            <p class="card-text" id="nyc-flu-summary">
+                            <p class="card-text">
+                                <strong>Most recent 7-day average</strong>
+                                (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide: <span id="nyc-hosp-7day"></span>,
+                                Per <a href="https://en.wikipedia.org/wiki/Lakh"
+                                    target="_blank">lakh</a>:
+                                <span id="nyc-hosp-7day-lakh"></span>
                             </p>
-                            <p class="card-text nyc-flu-pdf">
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average
+                                    </strong>
+                                (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-hosp-7day-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-hosp-7day-complete-lakh"></span>
                             </p>
                         </div>
-                        <div class="card-footer nyc-flu-source">
+                        <div class="card-footer nyc-source">
                             <h5 class="card-title">Source</h5>
                         </div>
                     </div>
@@ -267,33 +203,34 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">
-                                RSV positive test results in NYC
-                            </h5>
-                            <div id="nyc-rsv-results">
+                            <h5 class="card=title">COVID Cases in NYC</h5>
+                            <div>
+                                <canvas id="nyc-cases-chart"></canvas>
                             </div>
-                            <p class="card-text nyc-flu-pdf">
+                            <p class="card-text">
+                                <strong>
+                                    Most recent 7-day average:
+                                </strong>
+                                (<span class="nyc-latest-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-cases-7day"></span>,
+                                Per lakh:
+                                <span id="nyc-cases-7day-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average:
+                                </strong>
+                                (<span class="nyc-complete-date"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-cases-7day-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-cases-7day-complete-lakh"></span>
                             </p>
                         </div>
-                        <div class="card-footer nyc-flu-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-md-2 py-2">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                Outpatient influenza-like illness visits in NYC
-                            </h5>
-                            <div id="nyc-ili-visits">
-                            </div>
-                            <p class="card-text nyc-flu-pdf">
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-flu-source">
+                        <div class="card-footer nyc-source">
                             <h5 class="card-title">Source</h5>
                         </div>
                     </div>
@@ -309,13 +246,4 @@
     <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
 
     <script type="module" src="static/js/main.js"></script>
-    <script type='text/javascript'>
-        const divElement = document.getElementById('viz1735570512931');
-        var vizElement = divElement.getElementsByTagName('object')[0];
-        vizElement.width = "100%";
-        vizElement.style["min-height"] = "600px";
-        const scriptElement = document.createElement('script');
-        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
-        vizElement.parentNode.insertBefore(scriptElement, vizElement);
-    </script>
 </html>

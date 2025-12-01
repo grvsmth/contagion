@@ -42,6 +42,20 @@ export default class Ui {
         });
     }
 
+    displayWeeklyData(data) {
+        console.log("displayWeeklyData", data);
+
+        this.output.nycWeeklyCases.sevenDayAverage.innerText =
+            data.all_case_count_7day_avg;
+        this.output.nycWeeklyCases.sevenDayPerLakh.innerText =
+            Ui.perLakh(data.all_case_count_7day_avg);
+
+        const latestDate = new Date(data.date);
+        this.output.nycLatestDate.forEach((element) => {
+            element.innerText = latestDate.toLocaleDateString();
+        });
+    }
+
     displayCompleteData(data) {
         this.output.nycHospitalization.sevenDayComplete.innerText =
             data.hosp_count_7day_avg;

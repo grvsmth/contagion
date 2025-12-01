@@ -8,9 +8,9 @@ import compute from "./compute.js";
 
 const localityName = {
     "daily": "NYC",
-    "fluRsv": "NYC_Flu_Pdf",
     "resp": "CDC_RESP_NET",
-    "wastewater": "NYC_Wastewater"
+    "wastewater": "NYC_Wastewater",
+    "cases": "NYC_Cases"
 };
 
 const apiVersion = 0.1;
@@ -26,11 +26,23 @@ const dailyInfo = localityInfo.find((locality) =>
     locality.name === localityName.daily);
 const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
 
+const casesInfo = localityInfo.find((locality) =>
+    locality.name === localityName.cases);
+const weekDataUrl = "/api/" + apiVersion + "/week-data/";
+
 let dayData = {};
 try {
     dayData = await cacheClient.fetchData(dayDataUrl);
 } catch (error) {
     console.log("Error retrieving data from " + dayDataUrl, error);
+}
+
+let weekData = {};
+try {
+    weekData = await cacheClient.fetchData(weekDataUrl);
+    console.log("weekData", weekData);
+} catch (error) {
+    console.log("Error retrieving data from " + weekDataUrl, error);
 }
 
 const wastewaterInfo = localityInfo.find((locality) =>
@@ -44,20 +56,6 @@ const wastewaterAverageUrl = "/api/" + apiVersion
     + "/wastewater-averages/?locality=" + wastewaterInfo.pk + "&wrrf=" + wrrf;
 const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
 
-const fluSourceInfo = localityInfo.find(locality =>
-    locality.name === localityName.fluRsv);
-const documentUrl = "/api/" + apiVersion + "/documents";
-const documentInfo = await cacheClient.fetchData(documentUrl);
-
-const latestDocumentInfo = documentInfo[documentInfo.length -1];
-const fluRsvImageUrl = "/api/" + apiVersion + "/chart-images/"
-    + "?document=" + latestDocumentInfo.pk;
-const fluRsvImageInfo = await cacheClient.fetchData(fluRsvImageUrl);
-
-const fluRsvHighlightsUrl = "/api/" + apiVersion + "/highlights-text/"
-    + "?document=" + latestDocumentInfo.pk;
-const fluRsvHighlights = await cacheClient.fetchData(fluRsvHighlightsUrl);
-
 const respDataUrl = "/api/" + apiVersion + "/resp-data/?season=2024-25";
 
 let respData = {};
@@ -67,12 +65,15 @@ try {
     console.log("Error retrieving data from " + respDataUrl, error);
 }
 
-console.log("respData", respData);
-
 
 const latestDayData = dayData[dayData.length - 1];
 const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
+});
+
+const latestWeekData = weekData[weekData.length - 1];
+const latestCompleteWeek = weekData.findLast((weekInfo) => {
+    return !weekInfo.incomplete;
 });
 
 const deathsLastMonth = compute.rangeTotal(
@@ -117,12 +118,10 @@ const staleDaily = compute.isStale(
     staleThreshold, latestComplete.date_of_interest
 );
 
+const staleWeekly = compute.isStale(staleThreshold, latestWeekData.date);
+
 const staleWastewater = compute.isStale(
     staleThreshold, latestWastewaterData.sample_date
-);
-
-const staleFlu = compute.isStale(
-    staleThreshold, latestDocumentInfo.publication_date
 );
 
 const staleResp = compute.isStale(
@@ -144,6 +143,13 @@ ui.setOutput({
         "sevenDayComplete": document.querySelector("#nyc-cases-7day-complete"),
         "sevenDayCompletePerLakh": document
             .querySelector("#nyc-cases-7day-complete-lakh")
+    },
+    "nycWeeklyCases": {
+        "sevenDayAverage": document.querySelector("#nyc-cases-week"),
+        "sevenDayPerLakh": document.querySelector("#nyc-cases-week-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-cases-week-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-cases-week-complete-lakh")
     },
     "nycDeath": {
         "sevenDayAverage": document.querySelector("#nyc-death-7day"),
@@ -188,6 +194,7 @@ ui.setOutput({
     "nycComplete30Begin": document.querySelector("#nyc-30days-begin"),
     "sourceElement": {
         "NYC": document.querySelectorAll(".nyc-source"),
+        "NYC_Cases": document.querySelectorAll(".nyc-week-source"),
         "NYC_Flu_Pdf": document.querySelectorAll(".nyc-flu-source"),
         "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source"),
         "CDC_RESP_NET": document.querySelectorAll(".resp-source")
@@ -196,17 +203,11 @@ ui.setOutput({
 
 ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
+ui.displayWeeklyData(latestWeekData);
+// ui.displayCompleteData(latestComplete);
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
-/*
-ui.displayLatestWastewaterData(latestWastewaterData);
-ui.displayLatestWastewaterAverage(latestWastewaterAverage);
-*/
-fluRsvImageInfo.forEach(chartInfo =>
-    ui.displayChart(localityName.fluRsv, chartInfo)
-);
-ui.displayHighlights(localityName.fluRsv, fluRsvHighlights);
-ui.displayPdfLinks(localityName.fluRsv, latestDocumentInfo);
+
 
 for (status in respByStatus) {
     ui.displayRespData(status, respByStatus[status]);
@@ -214,7 +215,7 @@ for (status in respByStatus) {
 
 ui.displaySource(dailyInfo, staleDaily);
 ui.displaySource(wastewaterInfo, staleWastewater);
-ui.displaySource(fluSourceInfo, staleFlu);
+ui.displaySource(casesInfo, staleWeekly);
 ui.displaySource(respInfo, staleResp);
 
 /**
@@ -240,21 +241,21 @@ chartManager.displayData({
         "data": dayData.map(row => row.hosp_count_7day_avg)
     }]
 });
-
+/*
 chartManager.displayData({
     "chartType": "line",
-    "element": document.querySelector("#nyc-cases-chart"),
-    "labels": dayLabels,
+    "element": document.querySelector("#nyc-week-cases-chart"),
+    "labels": weekLabels,
     "legend": {
         "display": false
     },
     "title": "Cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
-        "data": dayData.map(row => row.all_case_count_7day_avg)
+        "data": weekData.map(row => row.value)
     }]
 });
-
+*/
 chartManager.displayData({
     "chartType": "bar",
     "element": document.querySelector("#nyc-deaths-chart"),
@@ -268,23 +269,7 @@ chartManager.displayData({
         "data": dayData.map(row => row.death_count)
     }]
 });
-/*
-chartManager.displayData({
-    "element": document.querySelector("#nyc-wastewater-chart"),
-    "labels": wastewaterAverageData.map(row =>
-        chartManager.formatDate(row.end_date)
-    ),
-    "legend": {
-        "display": false
-    },
-    "title": "Wastewater two-week averages",
-    "datasets": [{
-        "backgroundColor": "#E36414",
-        "data": wastewaterAverageData.map(row => row.average),
-        "type": "line"
-    }]
-});
-*/
+
 chartManager.displayData({
     "element": document.querySelector("#resp-chart"),
     "labels": respData.map(row =>

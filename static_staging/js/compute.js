@@ -58,7 +58,7 @@ exports.isStale = function(thresholdDays, inputDateString) {
 
     const inputDate = new Date(inputDateString);
     if (!(inputDate instanceof Date) || isNaN(inputDate)) {
-        console.log("Invalid input date", inputDateString)
+        console.error("Invalid input date for isStale: " + inputDateString);
     }
 
     return inputDate <= thresholdDate;
