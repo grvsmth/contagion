@@ -35,6 +35,8 @@ networkRate = {
     "RSV-NET": "rsv_rate"
 }
 
+weeklyLocalities = ['NYC_Cases', 'NYC_Deaths']
+
 
 class Command(BaseCommand):
     help = "Retrieves updated data for the specified localities and caches it"
@@ -67,8 +69,6 @@ class Command(BaseCommand):
 
     @classmethod
     def convertWeekData(cls, locality, row):
-        weekDict = {key.lower(): value for key, value in row.items()}
-
         (month, day, year) = row['date'].split('/')
         inputDatetime = datetime(
             int(year),
@@ -76,9 +76,15 @@ class Command(BaseCommand):
             int(day),
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
+        value = row['value']
+        if not value:
+            value = 0
 
-        weekDict['date'] = str(inputDatetime)
-        weekDict['locality'] = locality.pk
+        weekDict = {
+            'date': str(inputDatetime),
+            'locality': locality.pk,
+            'value': value
+        }
 
         return weekDict
 
@@ -116,7 +122,8 @@ class Command(BaseCommand):
 
             try:
                 weekData.instance = WeekData.objects.get(
-                    date=weekDict.get('date_of_interest')
+                    date=weekDict.get('date'),
+                    locality=locality.pk
                 )
             except(WeekData.DoesNotExist, ValidationError):
                 pass
@@ -248,7 +255,7 @@ class Command(BaseCommand):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
             content = self.fetch(locality.now_url, localityName)
-            if localityName == 'NYC_Cases':
+            if localityName in weeklyLocalities:
                 self.cacheWeekData(locality, content)
 
             if localityName == 'CDC_RESP_NET':

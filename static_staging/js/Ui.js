@@ -42,31 +42,39 @@ export default class Ui {
         });
     }
 
-    displayWeeklyData(data) {
-        console.log("displayWeeklyData", data);
+    displayWeeklyData(casesData, deathsData) {
+        const avg7dayCases = Math.round(casesData.value / 7);
 
-        const avg7day = Math.round(data.value / 7);
-
-        this.output.nycWeeklyCases.sevenDayAverage.innerText = avg7day;
+        this.output.nycWeeklyCases.sevenDayAverage.innerText = avg7dayCases;
         this.output.nycWeeklyCases.sevenDayPerLakh.innerText =
-            Ui.perLakh(avg7day);
+            Ui.perLakh(avg7dayCases);
 
-        const latestDate = new Date(data.date);
+        const avg7dayDeaths = Math.round(deathsData.value / 7);
+
+        this.output.nycWeeklyDeaths.sevenDayAverage.innerText = avg7dayDeaths;
+        this.output.nycWeeklyDeaths.sevenDayPerLakh.innerText =
+            Ui.perLakh(avg7dayDeaths);
+
+        const latestDate = new Date(casesData.date);
         this.output.nycLatestWeek.forEach((element) => {
             element.innerText = latestDate.toLocaleDateString();
         });
     }
 
-    displayCompleteWeeklyData(data) {
-        console.log("displayCompleteWeeklyData", data);
+    displayCompleteWeeklyData(casesData, deathsData) {
+        const avg7dayCases = Math.round(casesData.value / 7);
 
-        const avg7day = Math.round(data.value / 7);
-
-        this.output.nycWeeklyCases.sevenDayComplete.innerText = avg7day;
+        this.output.nycWeeklyCases.sevenDayComplete.innerText = avg7dayCases;
         this.output.nycWeeklyCases.sevenDayCompletePerLakh.innerText =
-            Ui.perLakh(avg7day);
+            Ui.perLakh(avg7dayCases);
 
-        const latestCompleteDate = new Date(data.date);
+        const avg7dayDeaths = Math.round(deathsData.value / 7);
+
+        this.output.nycWeeklyDeaths.sevenDayComplete.innerText = avg7dayDeaths;
+        this.output.nycWeeklyDeaths.sevenDayCompletePerLakh.innerText =
+            Ui.perLakh(avg7dayDeaths);
+
+        const latestCompleteDate = new Date(casesData.date);
         this.output.nycCompleteWeek.forEach((element) => {
             element.innerText = latestCompleteDate.toLocaleDateString();
         });
@@ -215,7 +223,7 @@ export default class Ui {
 
     displayLastMonth(lastMonth) {
         this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
-        const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;
+        const monthText = `${lastMonth.monthName}, ${lastMonth.days} weeks`;
 
         this.output.nycLastMonth.forEach((element) => {
             element.innerText = monthText;

@@ -3,13 +3,15 @@ import { DateTime } from "/static/node_modules/luxon/build/es6/luxon.js";
 const exports = {};
 
 exports.isLastMonth = function(dayItem) {
-    const dayDate = DateTime.fromISO(dayItem.date_of_interest);
-    return dayDate.get("month") === this.lastMonth;
+    const dayDate = DateTime.fromISO(dayItem.date);
+
+    return dayDate.get("year") === this.lastMonthYear
+        && dayDate.get("month") === this.lastMonth;
 };
 
 exports.daysFilter = function(dayItem) {
     const beginDate = DateTime.fromISO(this.endDateString).minus({"days": 30});
-    const dayDate = DateTime.fromISO(dayItem.date_of_interest);
+    const dayDate = DateTime.fromISO(dayItem.date);
     const endDate = DateTime.fromISO(this.endDateString);
     return dayDate > beginDate && dayDate <= endDate;
 };
@@ -20,7 +22,9 @@ exports.addValues = function(accumulator, currentValue) {
 
 exports.rangeTotal = function(dayData, filterKey, filterThis, propertyKey) {
     const today = DateTime.now().setZone(filterThis.timezone);
-    filterThis.lastMonth = today.minus({"months": 1}).get("month");
+    const lastMonth = today.minus({"months": 1});
+    filterThis.lastMonth = lastMonth.get("month");
+    filterThis.lastMonthYear = lastMonth.get("year");
 
     const zeroResult = {
         "deaths": 0,
@@ -37,12 +41,12 @@ exports.rangeTotal = function(dayData, filterKey, filterThis, propertyKey) {
         return zeroResult;
     }
 
-    if (!('date_of_interest' in rangeData[0])) {
-        console.error('No date_of_interest', rangeData[0]);
+    if (!('date' in rangeData[0])) {
+        console.error('No date', rangeData[0]);
         return zeroResult;
     }
 
-    const firstDayDate = DateTime.fromISO(rangeData[0].date_of_interest);
+    const firstDayDate = DateTime.fromISO(rangeData[0].date);
 
     return {
         "beginDate": firstDayDate.toLocaleString(DateTime.DATE_SHORT),

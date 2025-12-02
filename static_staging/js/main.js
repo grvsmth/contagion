@@ -10,7 +10,8 @@ const localityName = {
     "daily": "NYC",
     "resp": "CDC_RESP_NET",
     "wastewater": "NYC_Wastewater",
-    "cases": "NYC_Cases"
+    "cases": "NYC_Cases",
+    "deaths": "NYC_Deaths"
 };
 
 const apiVersion = 0.1;
@@ -29,7 +30,13 @@ const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
 
 const casesInfo = localityInfo.find((locality) =>
     locality.name === localityName.cases);
-const weekDataUrl = "/api/" + apiVersion + "/week-data/";
+const weeklyCasesDataUrl = "/api/" + apiVersion + "/week-data/?locality="
+    + casesInfo.pk;
+
+const deathsInfo = localityInfo.find((locality) =>
+    locality.name === localityName.deaths);
+const weeklyDeathsDataUrl = "/api/" + apiVersion + "/week-data/?locality="
+    + deathsInfo.pk;
 
 let dayData = {};
 try {
@@ -38,11 +45,18 @@ try {
     console.log("Error retrieving data from " + dayDataUrl, error);
 }
 
-let weekData = {};
+let weeklyCasesData = {};
 try {
-    weekData = await cacheClient.fetchData(weekDataUrl);
+    weeklyCasesData = await cacheClient.fetchData(weeklyCasesDataUrl);
 } catch (error) {
-    console.log("Error retrieving data from " + weekDataUrl, error);
+    console.log("Error retrieving data from " + weeklyCasesDataUrl, error);
+}
+
+let weeklyDeathsData = {};
+try {
+    weeklyDeathsData = await cacheClient.fetchData(weeklyDeathsDataUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
 const wastewaterInfo = localityInfo.find((locality) =>
@@ -71,23 +85,30 @@ const latestComplete = dayData.findLast((dayInfo) => {
     return !dayInfo.incomplete;
 });
 
-const latestWeekData = weekData[weekData.length - 1];
-const latestCompleteWeek = weekData[weekData.length - (completeDelay + 1)];
+const latestWeeklyCasesData = weeklyCasesData[weeklyCasesData.length - 1];
+const latestCompleteWeeklyCases = weeklyCasesData[
+    weeklyCasesData.length - (completeDelay + 1)
+];
+
+const latestWeeklyDeathsData = weeklyDeathsData[weeklyDeathsData.length - 1];
+const latestCompleteWeeklyDeaths = weeklyDeathsData[
+    weeklyDeathsData.length - (completeDelay + 1)
+];
 
 const deathsLastMonth = compute.rangeTotal(
-    dayData,
+    weeklyDeathsData,
     "isLastMonth",
     {"timezone": dailyInfo.time_zone_name},
-    "death_count"
+    "value"
 );
 
 const thirtyDayThis = {
     "days": 30,
-    "endDateString": latestComplete.date_of_interest
+    "endDateString": latestCompleteWeeklyDeaths.date
 };
 
 const deathsThirtyDays = compute.rangeTotal(
-    dayData, "daysFilter", thirtyDayThis, "death_count"
+    weeklyDeathsData, "daysFilter", thirtyDayThis, "value"
 );
 
 const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
@@ -116,7 +137,7 @@ const staleDaily = compute.isStale(
     staleThreshold, latestComplete.date_of_interest
 );
 
-const staleWeekly = compute.isStale(staleThreshold, latestWeekData.date);
+const staleWeekly = compute.isStale(staleThreshold, latestWeeklyCasesData.date);
 
 const staleWastewater = compute.isStale(
     staleThreshold, latestWastewaterData.sample_date
@@ -148,6 +169,13 @@ ui.setOutput({
         "sevenDayComplete": document.querySelector("#nyc-cases-week-complete"),
         "sevenDayCompletePerLakh": document
             .querySelector("#nyc-cases-week-complete-lakh")
+    },
+    "nycWeeklyDeaths": {
+        "sevenDayAverage": document.querySelector("#nyc-deaths-week"),
+        "sevenDayPerLakh": document.querySelector("#nyc-deaths-week-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-deaths-week-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-deaths-week-complete-lakh")
     },
     "nycDeath": {
         "sevenDayAverage": document.querySelector("#nyc-death-7day"),
@@ -195,6 +223,7 @@ ui.setOutput({
     "sourceElement": {
         "NYC": document.querySelectorAll(".nyc-source"),
         "NYC_Cases": document.querySelectorAll(".nyc-week-source"),
+        "NYC_Deaths": document.querySelectorAll(".nyc-week-source"),
         "NYC_Flu_Pdf": document.querySelectorAll(".nyc-flu-source"),
         "NYC_Wastewater": document.querySelectorAll(".nyc-wastewater-source"),
         "CDC_RESP_NET": document.querySelectorAll(".resp-source")
@@ -203,8 +232,10 @@ ui.setOutput({
 
 ui.displayLatestData(latestDayData);
 ui.displayCompleteData(latestComplete);
-ui.displayWeeklyData(latestWeekData);
-ui.displayCompleteWeeklyData(latestCompleteWeek);
+ui.displayWeeklyData(latestWeeklyCasesData, latestWeeklyDeathsData);
+ui.displayCompleteWeeklyData(
+    latestCompleteWeeklyCases, latestCompleteWeeklyDeaths
+);
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
 
@@ -228,7 +259,9 @@ const dayLabels = dayData.map(row =>
     chartManager.formatDate(row.date_of_interest)
 );
 
-const weekLabels = weekData.map(row => chartManager.formatDate(row.date));
+const weekLabels = weeklyCasesData.map(
+    row => chartManager.formatDate(row.date)
+);
 
 chartManager.displayData({
     "chartType": "line",
@@ -251,24 +284,24 @@ chartManager.displayData({
     "legend": {
         "display": false
     },
-    "title": "Cases per week (7-day average, confirmed and probable)",
+    "title": "Cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
-        "data": weekData.map(row => Math.round(row.value / 7))
+        "data": weeklyCasesData.map(row => Math.round(row.value / 7))
     }]
 });
 
 chartManager.displayData({
-    "chartType": "bar",
-    "element": document.querySelector("#nyc-deaths-chart"),
-    "labels": dayLabels,
+    "chartType": "line",
+    "element": document.querySelector("#nyc-week-deaths-chart"),
+    "labels": weekLabels,
     "legend": {
         "display": false
     },
-    "title": "Deaths per day",
+    "title": "Deaths per week",
     "datasets": [{
         "backgroundColor": "#FB8B24",
-        "data": dayData.map(row => row.death_count)
+        "data": weeklyDeathsData.map(row => row.value)
     }]
 });
 

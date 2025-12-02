@@ -47,6 +47,53 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
+                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <div>
+                                <canvas id="nyc-week-deaths-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent 7-day average:
+                                </strong>
+                                (<span class="nyc-latest-week"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-deaths-week"></span>,
+                                Per lakh:
+                                <span id="nyc-deaths-week-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average:
+                                </strong>
+                                (<span class="nyc-complete-week"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-deaths-week-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-deaths-week-complete-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent month:
+                                (<span class="last-month"></span>):
+                                <span id="nyc-death-last-month"></span>
+                            </p>
+                            <p class="card-text">
+                                Total deaths in the most recent 30 days with
+                                complete data
+                                (<span id="nyc-30days-begin"></span> -
+                                <span class="nyc-complete-date"></span>):
+                                <span id="nyc-death-30days"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-week-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
                             <h5 class="card=title">COVID Cases in NYC</h5>
                             <div>
                                 <canvas id="nyc-week-cases-chart"></canvas>
@@ -97,18 +144,6 @@
                                 Most recent complete 7-day average:
                                 (<span class="nyc-complete-date"></span>):
                                 <span id="nyc-death-7day-complete"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent month:
-                                (<span class="last-month"></span>):
-                                <span id="nyc-death-last-month"></span>
-                            </p>
-                            <p class="card-text">
-                                Total deaths in the most recent 30 days with
-                                complete data
-                                (<span id="nyc-30days-begin"></span> -
-                                <span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-30days"></span>
                             </p>
                         </div>
                         <div class="card-footer nyc-source">
