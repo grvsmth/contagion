@@ -41,6 +41,8 @@ class DayData(Model):
 
 class WeekData(Model):
     date = DateTimeField('date')
+    metric = CharField("metric", max_length=100, db_index=True)
+    submetric = CharField("submetric", max_length=100, db_index=True, null=True)
     value = IntegerField()
 
     locality = ForeignKey(
@@ -52,7 +54,13 @@ class WeekData(Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint("date", "locality", name="uniqueDateLocality")
+            UniqueConstraint(
+                "date",
+                "metric",
+                "submetric",
+                "locality",
+                name="uniqueDateLocality"
+            )
         ]
 
 class RespData(Model):

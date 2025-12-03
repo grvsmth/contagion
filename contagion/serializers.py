@@ -65,6 +65,8 @@ class WeekDataSerializer(HyperlinkedModelSerializer):
         fields = [
             'locality',
             'date',
+            'metric',
+            'submetric',
             'value'
         ]
 

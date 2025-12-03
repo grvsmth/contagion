@@ -83,6 +83,8 @@ class Command(BaseCommand):
         weekDict = {
             'date': str(inputDatetime),
             'locality': locality.pk,
+            'metric': row['metric'],
+            'submetric': row['submetric'],
             'value': value
         }
 
@@ -123,6 +125,8 @@ class Command(BaseCommand):
             try:
                 weekData.instance = WeekData.objects.get(
                     date=weekDict.get('date'),
+                    metric=weekDict.get('metric'),
+                    submetric=weekDict.get('submetric'),
                     locality=locality.pk
                 )
             except(WeekData.DoesNotExist, ValidationError):

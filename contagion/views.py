@@ -42,7 +42,7 @@ class DayDataFilter(FilterSet):
 class WeekDataFilter(FilterSet):
     class Meta:
         model = WeekData
-        fields = ['date', 'locality']
+        fields = ['date', 'metric', 'submetric', 'locality']
 
 class HighlightsTextFilter(FilterSet):
     class Meta:
