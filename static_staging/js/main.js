@@ -15,7 +15,6 @@ const localityName = {
 };
 
 const apiVersion = 0.1;
-const wrrf = "BB";
 const staleThreshold = 30;
 const completeDelay = 2;
 
@@ -24,32 +23,21 @@ const localityUrl = "/api/" + apiVersion + "/localities/";
 const cacheClient = new CacheClient();
 const localityInfo = await cacheClient.fetchData(localityUrl);
 
-const dailyInfo = localityInfo.find((locality) =>
-    locality.name === localityName.daily);
-const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
-
-const casesInfo = localityInfo.find((locality) =>
+const covidCasesInfo = localityInfo.find((locality) =>
     locality.name === localityName.cases);
-const weeklyCasesDataUrl = "/api/" + apiVersion + "/week-data/?locality="
-    + casesInfo.pk + "&metric=" + encodeURIComponent("COVID-19 cases");
+const covidCasesDataUrl = "/api/" + apiVersion + "/week-data/?locality="
+    + covidCasesInfo.pk + "&metric=" + encodeURIComponent("COVID-19 cases");
 
 const deathsInfo = localityInfo.find((locality) =>
     locality.name === localityName.deaths);
 const weeklyDeathsDataUrl = "/api/" + apiVersion + "/week-data/?locality="
     + deathsInfo.pk + "&metric=" + encodeURIComponent("COVID-19 deaths");
 
-let dayData = {};
+let covidCasesData = {};
 try {
-    dayData = await cacheClient.fetchData(dayDataUrl);
+    covidCasesData = await cacheClient.fetchData(covidCasesDataUrl);
 } catch (error) {
-    console.log("Error retrieving data from " + dayDataUrl, error);
-}
-
-let weeklyCasesData = {};
-try {
-    weeklyCasesData = await cacheClient.fetchData(weeklyCasesDataUrl);
-} catch (error) {
-    console.log("Error retrieving data from " + weeklyCasesDataUrl, error);
+    console.log("Error retrieving data from " + covidCasesDataUrl, error);
 }
 
 let weeklyDeathsData = {};
@@ -59,35 +47,9 @@ try {
     console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
-const wastewaterInfo = localityInfo.find((locality) =>
-    locality.name === localityName.wastewater);
-
-const wastewaterUrl = "/api/" + apiVersion + "/wastewater-data/?locality="
-    + wastewaterInfo.pk + "&wrrf_abbreviation=" + wrrf;
-const wastewaterData = await cacheClient.fetchData(wastewaterUrl);
-
-const wastewaterAverageUrl = "/api/" + apiVersion
-    + "/wastewater-averages/?locality=" + wastewaterInfo.pk + "&wrrf=" + wrrf;
-const wastewaterAverageData = await cacheClient.fetchData(wastewaterAverageUrl);
-
-const respDataUrl = "/api/" + apiVersion + "/resp-data/?season=2024-25";
-
-let respData = {};
-try {
-    respData = await cacheClient.fetchData(respDataUrl);
-} catch (error) {
-    console.log("Error retrieving data from " + respDataUrl, error);
-}
-
-
-const latestDayData = dayData[dayData.length - 1];
-const latestComplete = dayData.findLast((dayInfo) => {
-    return !dayInfo.incomplete;
-});
-
-const latestWeeklyCasesData = weeklyCasesData[weeklyCasesData.length - 1];
-const latestCompleteWeeklyCases = weeklyCasesData[
-    weeklyCasesData.length - (completeDelay + 1)
+const latestCovidCasesData = covidCasesData[covidCasesData.length - 1];
+const latestCompleteCovidCases = covidCasesData[
+    covidCasesData.length - (completeDelay + 1)
 ];
 
 const latestWeeklyDeathsData = weeklyDeathsData[weeklyDeathsData.length - 1];
@@ -98,7 +60,7 @@ const latestCompleteWeeklyDeaths = weeklyDeathsData[
 const deathsLastMonth = compute.rangeTotal(
     weeklyDeathsData,
     "isLastMonth",
-    {"timezone": dailyInfo.time_zone_name},
+    {"timezone": covidCasesInfo.time_zone_name},
     "value"
 );
 
@@ -111,108 +73,25 @@ const deathsThirtyDays = compute.rangeTotal(
     weeklyDeathsData, "daysFilter", thirtyDayThis, "value"
 );
 
-const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
-const latestWastewaterAverage = wastewaterAverageData[
-    wastewaterAverageData.length - 1
-];
-
-const respInfo = localityInfo.find((locality) =>
-    locality.name === localityName.resp
-);
-
-let respByStatus = {
-    "complete": {},
-    "latest": {}
-};
-
-if (respData.length) {
-    respByStatus["latest"] = respData[respData.length - 1];
-}
-
-if (respData.length > 3) {
-    respByStatus["complete"] = respData[respData.length - 3];
-}
-
-const staleDaily = compute.isStale(
-    staleThreshold, latestComplete.date_of_interest
-);
-
-const staleWeekly = compute.isStale(staleThreshold, latestWeeklyCasesData.date);
-
-const staleWastewater = compute.isStale(
-    staleThreshold, latestWastewaterData.sample_date
-);
-
-const staleResp = compute.isStale(
-    staleThreshold, respByStatus["complete"].week_ending_date
-);
+const staleWeekly = compute.isStale(staleThreshold, latestCovidCasesData.date);
 
 const ui = new Ui();
 ui.setOutput({
-    "nycHospitalization": {
-        "sevenDayAverage": document.querySelector("#nyc-hosp-7day"),
-        "sevenDayPerLakh": document.querySelector("#nyc-hosp-7day-lakh"),
-        "sevenDayComplete": document.querySelector("#nyc-hosp-7day-complete"),
+    "nycCovidCases": {
+        "sevenDayAverage": document.querySelector("#nyc-covid-cases-week"),
+        "sevenDayPerLakh": document.querySelector("#nyc-covid-cases-week-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-covid-cases-week-complete"),
         "sevenDayCompletePerLakh": document
-            .querySelector("#nyc-hosp-7day-complete-lakh")
-    },
-    "nycCases": {
-        "sevenDayAverage": document.querySelector("#nyc-cases-7day"),
-        "sevenDayPerLakh": document.querySelector("#nyc-cases-7day-lakh"),
-        "sevenDayComplete": document.querySelector("#nyc-cases-7day-complete"),
-        "sevenDayCompletePerLakh": document
-            .querySelector("#nyc-cases-7day-complete-lakh")
-    },
-    "nycWeeklyCases": {
-        "sevenDayAverage": document.querySelector("#nyc-cases-week"),
-        "sevenDayPerLakh": document.querySelector("#nyc-cases-week-lakh"),
-        "sevenDayComplete": document.querySelector("#nyc-cases-week-complete"),
-        "sevenDayCompletePerLakh": document
-            .querySelector("#nyc-cases-week-complete-lakh")
+            .querySelector("#nyc-covid-cases-week-complete-lakh")
     },
     "nycWeeklyDeaths": {
         "sevenDayAverage": document.querySelector("#nyc-deaths-week"),
         "sevenDayPerLakh": document.querySelector("#nyc-deaths-week-lakh"),
         "sevenDayComplete": document.querySelector("#nyc-deaths-week-complete"),
         "sevenDayCompletePerLakh": document
-            .querySelector("#nyc-deaths-week-complete-lakh")
-    },
-    "nycDeath": {
-        "sevenDayAverage": document.querySelector("#nyc-death-7day"),
-        "sevenDayComplete": document.querySelector("#nyc-death-7day-complete"),
-        "lastMonth": document.querySelector("#nyc-death-last-month"),
-        "thirtyDays": document.querySelector("#nyc-death-30days")
-    },
-    "nycWastewater": {
-        "latestDate": document.querySelector("#nyc-wastewater-latest-date"),
-        "latestCount": document.querySelector("#nyc-wastewater-latest-count"),
-        "latestAverage": document.querySelector("#nyc-wastewater-7day"),
-        "wrrf": document.querySelector("#nyc-wrrf")
-    },
-    "NYC_Flu_Pdf": {
-        "flu_results": document.querySelector("#nyc-flu-results"),
-        "flu_summary": document.querySelector("#nyc-flu-summary"),
-        "ili_visits": document.querySelector("#nyc-ili-visits"),
-        "pdfInfo": document.querySelectorAll(".nyc-flu-pdf"),
-        "rsv_results": document.querySelector("#nyc-rsv-results")
-    },
-    "CDC_RESP_NET": {
-        "results": document.querySelector("#resp-results"),
-        "summary": document.querySelector("#resp-summary"),
-        "complete": {
-            "date": document.querySelector("#resp-complete-date"),
-            "combined": document.querySelector("#resp-complete-combined"),
-            "covid": document.querySelector("#resp-complete-covid"),
-            "flu": document.querySelector("#resp-complete-flu"),
-            "rsv": document.querySelector("#resp-complete-rsv")
-        },
-        "latest": {
-            "date": document.querySelector("#resp-latest-date"),
-            "combined": document.querySelector("#resp-latest-combined"),
-            "covid": document.querySelector("#resp-latest-covid"),
-            "flu": document.querySelector("#resp-latest-flu"),
-            "rsv": document.querySelector("#resp-latest-rsv")
-        }
+            .querySelector("#nyc-deaths-week-complete-lakh"),
+        "lastMonth": document.querySelector("#nyc-deaths-last-month"),
+        "thirtyDays": document.querySelector("#nyc-deaths-30days")
     },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
@@ -230,24 +109,15 @@ ui.setOutput({
     }
 });
 
-ui.displayLatestData(latestDayData);
-ui.displayCompleteData(latestComplete);
-ui.displayWeeklyData(latestWeeklyCasesData, latestWeeklyDeathsData);
+ui.displayWeeklyData(latestCovidCasesData, latestWeeklyDeathsData);
 ui.displayCompleteWeeklyData(
-    latestCompleteWeeklyCases, latestCompleteWeeklyDeaths
+    latestCompleteCovidCases, latestCompleteWeeklyDeaths
 );
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
 
 
-for (status in respByStatus) {
-    ui.displayRespData(status, respByStatus[status]);
-}
-
-ui.displaySource(dailyInfo, staleDaily);
-ui.displaySource(wastewaterInfo, staleWastewater);
-ui.displaySource(casesInfo, staleWeekly);
-ui.displaySource(respInfo, staleResp);
+ui.displaySource(covidCasesInfo, staleWeekly);
 
 /**
  * Palette via Coolors
@@ -255,31 +125,14 @@ ui.displaySource(respInfo, staleResp);
  * https://coolors.co/palette/5f0f40-9a031e-fb8b24-e36414-0f4c5c
  */
 const chartManager = new ChartManager();
-const dayLabels = dayData.map(row =>
-    chartManager.formatDate(row.date_of_interest)
-);
 
-const weekLabels = weeklyCasesData.map(
+const weekLabels = covidCasesData.map(
     row => chartManager.formatDate(row.date)
 );
 
 chartManager.displayData({
     "chartType": "line",
-    "element": document.querySelector("#nyc-hosp-chart"),
-    "labels": dayLabels,
-    "legend": {
-        "display": false
-    },
-    "title": "Hospitalizations per day (7-day average)",
-    "datasets": [{
-        "backgroundColor": "#5F0F40",
-        "data": dayData.map(row => row.hosp_count_7day_avg)
-    }]
-});
-
-chartManager.displayData({
-    "chartType": "line",
-    "element": document.querySelector("#nyc-week-cases-chart"),
+    "element": document.querySelector("#nyc-week-covid-cases-chart"),
     "labels": weekLabels,
     "legend": {
         "display": false
@@ -287,7 +140,7 @@ chartManager.displayData({
     "title": "Cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
-        "data": weeklyCasesData.map(row => Math.round(row.value / 7))
+        "data": covidCasesData.map(row => Math.round(row.value / 7))
     }]
 });
 
@@ -303,42 +156,4 @@ chartManager.displayData({
         "backgroundColor": "#FB8B24",
         "data": weeklyDeathsData.map(row => row.value)
     }]
-});
-
-chartManager.displayData({
-    "element": document.querySelector("#resp-chart"),
-    "labels": respData.map(row =>
-        chartManager.formatDate(row.week_ending_date)
-    ),
-    "legend": {
-        "display": true,
-        "position": "right"
-    },
-    "title": "Hospitalizations per lakh in the United States from CDC RESP-NET",
-    "datasets": [
-        {
-            "backgroundColor": "#E36414",
-            "data": respData.map(row => row.combined_rate),
-            "label": "Combined",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#FB8B24",
-            "data": respData.map(row => row.covid_rate),
-            "label": "COVID-19",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#9A031E",
-            "data": respData.map(row => row.flu_rate),
-            "label": "Influenza",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#5F0F40",
-            "data": respData.map(row => row.rsv_rate),
-            "label": "RSV",
-            "type": "line"
-        }
-    ]
 });

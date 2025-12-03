@@ -76,14 +76,14 @@
                             <p class="card-text">
                                 Total deaths in the most recent month:
                                 (<span class="last-month"></span>):
-                                <span id="nyc-death-last-month"></span>
+                                <span id="nyc-deaths-last-month"></span>
                             </p>
                             <p class="card-text">
                                 Total deaths in the most recent 30 days with
                                 complete data
                                 (<span id="nyc-30days-begin"></span> -
                                 <span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-30days"></span>
+                                <span id="nyc-deaths-30days"></span>
                             </p>
                         </div>
                         <div class="card-footer nyc-week-source">
@@ -96,7 +96,8 @@
                         <div class="card-body">
                             <h5 class="card=title">COVID Cases in NYC</h5>
                             <div>
-                                <canvas id="nyc-week-cases-chart"></canvas>
+                                <canvas id="nyc-week-covid-cases-chart">
+                                </canvas>
                             </div>
                             <p class="card-text">
                                 <strong>
@@ -105,9 +106,9 @@
                                 (<span class="nyc-latest-week"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-week"></span>,
+                                <span id="nyc-covid-cases-week"></span>,
                                 Per lakh:
-                                <span id="nyc-cases-week-lakh"></span>
+                                <span id="nyc-covid-cases-week-lakh"></span>
                             </p>
                             <p class="card-text">
                                 <strong>
@@ -116,9 +117,11 @@
                                 (<span class="nyc-complete-week"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-week-complete"></span>,
+                                <span id="nyc-covid-cases-week-complete">
+                                </span>,
                                 Per lakh:
-                                <span id="nyc-cases-week-complete-lakh"></span>
+                                <span id="nyc-covid-cases-week-complete-lakh">
+                                </span>
                             </p>
                         </div>
                         <div class="card-footer nyc-week-source">
@@ -131,141 +134,69 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card=title">COVID Deaths in NYC</h5>
+                            <h5 class="card=title">Influenza Cases in NYC</h5>
                             <div>
-                                <canvas id="nyc-deaths-chart"></canvas>
-                            </div>
-                            <p class="card-text">
-                                Most recent 7-day average:
-                                (<span class="nyc-latest-date"></span>):
-                                <span id="nyc-death-7day"></span>
-                            </p>
-                            <p class="card-text">
-                                Most recent complete 7-day average:
-                                (<span class="nyc-complete-date"></span>):
-                                <span id="nyc-death-7day-complete"></span>
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                COVID, flu and RSV hospitalizations 7-day average
-                                per lakh in the US
-                            </h5>
-                            <div>
-                                <canvas id="resp-chart"></canvas>
-                            </div>
-                            <table class="card-text table">
-                                <thead>
-                                    <th></th>
-                                    <th id="resp-complete-date"></th>
-                                    <th id="resp-latest-date"></th>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th>Combined</th>
-                                        <td id="resp-complete-combined"></td>
-                                        <td id="resp-latest-combined"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>COVID</th>
-                                        <td id="resp-complete-covid"></td>
-                                        <td id="resp-latest-covid"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Flu</th>
-                                        <td id="resp-complete-flu"></td>
-                                        <td id="resp-latest-flu"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>RSV</th>
-                                        <td id="resp-complete-rsv"></td>
-                                        <td id="resp-latest-rsv"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <p class="card-text" id="resp-summary">
-                            </p>
-                        </div>
-                        <div class="card-footer resp-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-md-2 py-2">
-                <div class="col">
-                    <div class="card" id="nyc-hosp">
-                        <div class="card-body">
-                            <h5 class="card=title">
-                                COVID Hospitalizations in NYC
-                            </h5>
-                            <div>
-                                <canvas id="nyc-hosp-chart"></canvas>
-                            </div>
-                            <p class="card-text">
-                                <strong>Most recent 7-day average</strong>
-                                (<span class="nyc-latest-date"></span>):
-                                <br />
-                                Citywide: <span id="nyc-hosp-7day"></span>,
-                                Per <a href="https://en.wikipedia.org/wiki/Lakh"
-                                    target="_blank">lakh</a>:
-                                <span id="nyc-hosp-7day-lakh"></span>
-                            </p>
-                            <p class="card-text">
-                                <strong>
-                                    Most recent complete 7-day average
-                                    </strong>
-                                (<span class="nyc-complete-date"></span>):
-                                <br />
-                                Citywide:
-                                <span id="nyc-hosp-7day-complete"></span>,
-                                Per lakh:
-                                <span id="nyc-hosp-7day-complete-lakh"></span>
-                            </p>
-                        </div>
-                        <div class="card-footer nyc-source">
-                            <h5 class="card-title">Source</h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card=title">COVID Cases in NYC</h5>
-                            <div>
-                                <canvas id="nyc-cases-chart"></canvas>
+                                <canvas id="nyc-flu-cases-chart"></canvas>
                             </div>
                             <p class="card-text">
                                 <strong>
                                     Most recent 7-day average:
                                 </strong>
-                                (<span class="nyc-latest-date"></span>):
+                                (<span class="nyc-latest-flu"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-7day"></span>,
+                                <span id="nyc-flu-cases"></span>,
                                 Per lakh:
-                                <span id="nyc-cases-7day-lakh"></span>
+                                <span id="nyc-flu-cases-lakh"></span>
                             </p>
                             <p class="card-text">
                                 <strong>
                                     Most recent complete 7-day average:
                                 </strong>
-                                (<span class="nyc-complete-date"></span>):
+                                (<span class="nyc-complete-flu-cases"></span>):
                                 <br />
                                 Citywide:
-                                <span id="nyc-cases-7day-complete"></span>,
+                                <span id="nyc-flu-cases-complete"></span>,
                                 Per lakh:
-                                <span id="nyc-cases-7day-complete-lakh"></span>
+                                <span id="nyc-flu-cases-complete-lakh"></span>
                             </p>
                         </div>
-                        <div class="card-footer nyc-source">
+                        <div class="card-footer nyc-week-source">
+                            <h5 class="card-title">Source</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card=title">RSV Cases in NYC</h5>
+                            <div>
+                                <canvas id="nyc-rsv-cases-chart"></canvas>
+                            </div>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent 7-day average:
+                                </strong>
+                                (<span class="nyc-latest-rsv"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-rsv-cases"></span>,
+                                Per lakh:
+                                <span id="nyc-rsv-cases-lakh"></span>
+                            </p>
+                            <p class="card-text">
+                                <strong>
+                                    Most recent complete 7-day average:
+                                </strong>
+                                (<span class="nyc-complete-rsv"></span>):
+                                <br />
+                                Citywide:
+                                <span id="nyc-rsv-cases-complete"></span>,
+                                Per lakh:
+                                <span id="nyc-rsv-cases-complete-lakh"></span>
+                            </p>
+                        </div>
+                        <div class="card-footer nyc-week-source">
                             <h5 class="card-title">Source</h5>
                         </div>
                     </div>
