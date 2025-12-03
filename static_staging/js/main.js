@@ -31,12 +31,12 @@ const dayDataUrl = "/api/" + apiVersion + "/day-data/?locality=" + dailyInfo.pk;
 const casesInfo = localityInfo.find((locality) =>
     locality.name === localityName.cases);
 const weeklyCasesDataUrl = "/api/" + apiVersion + "/week-data/?locality="
-    + casesInfo.pk;
+    + casesInfo.pk + "&metric=" + encodeURIComponent("COVID-19 cases");
 
 const deathsInfo = localityInfo.find((locality) =>
     locality.name === localityName.deaths);
 const weeklyDeathsDataUrl = "/api/" + apiVersion + "/week-data/?locality="
-    + deathsInfo.pk;
+    + deathsInfo.pk + "&metric=" + encodeURIComponent("COVID-19 deaths");
 
 let dayData = {};
 try {
