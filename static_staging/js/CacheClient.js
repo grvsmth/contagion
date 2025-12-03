@@ -38,7 +38,11 @@ export default class CacheClient {
                 }, reject);
             }, reject);
         });
+    }
 
+    buildUrl(apiVersion, locality, metric) {
+        return "/api/" + apiVersion + "/week-data/?locality="
+            + locality + "&metric=" + encodeURIComponent(metric);
     }
 
 }

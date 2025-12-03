@@ -25,7 +25,6 @@ export default class Ui {
     displayWeeklyData(casesData, deathsData) {
         const avg7dayCases = Math.round(casesData.value / 7);
 
-        console.log("displayWeeklyData", this);
         this.output.nycCovidCases.sevenDayAverage.innerText = avg7dayCases;
         this.output.nycCovidCases.sevenDayPerLakh.innerText =
             Ui.perLakh(avg7dayCases);
@@ -183,7 +182,6 @@ export default class Ui {
     }
 
     displayLastMonth(lastMonth) {
-        console.log("displayLastMonth", this);
         this.output.nycWeeklyDeaths.lastMonth.innerText = lastMonth.deaths;
         const monthText = `${lastMonth.monthName}, ${lastMonth.days} weeks`;
 

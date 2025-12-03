@@ -23,22 +23,32 @@ const localityUrl = "/api/" + apiVersion + "/localities/";
 const cacheClient = new CacheClient();
 const localityInfo = await cacheClient.fetchData(localityUrl);
 
-const covidCasesInfo = localityInfo.find((locality) =>
+const casesInfo = localityInfo.find((locality) =>
     locality.name === localityName.cases);
-const covidCasesDataUrl = "/api/" + apiVersion + "/week-data/?locality="
-    + covidCasesInfo.pk + "&metric=" + encodeURIComponent("COVID-19 cases");
+
+const casesDataUrl = {
+    "covid": cacheClient.buildUrl(apiVersion, casesInfo.pk, "COVID-19 cases"),
+    "flu": cacheClient.buildUrl(apiVersion, casesInfo.pk, "Influenza cases"),
+    "rsv": cacheClient.buildUrl(apiVersion, casesInfo.pk, "RSV cases"),
+};
 
 const deathsInfo = localityInfo.find((locality) =>
     locality.name === localityName.deaths);
-const weeklyDeathsDataUrl = "/api/" + apiVersion + "/week-data/?locality="
-    + deathsInfo.pk + "&metric=" + encodeURIComponent("COVID-19 deaths");
+const weeklyDeathsDataUrl = cacheClient.buildUrl(
+    apiVersion, deathsInfo.pk, "COVID-19 deaths"
+);
 
-let covidCasesData = {};
-try {
-    covidCasesData = await cacheClient.fetchData(covidCasesDataUrl);
-} catch (error) {
-    console.log("Error retrieving data from " + covidCasesDataUrl, error);
-}
+const casesData = {};
+
+for (const [key, dataUrl] of Object.entries(casesDataUrl)) {
+    let res = {};
+
+    try {
+        casesData[key] = await cacheClient.fetchData(dataUrl);
+    } catch (error) {
+        console.log("Error retrieving data from " + dataUrl, error);
+    }
+};
 
 let weeklyDeathsData = {};
 try {
@@ -47,9 +57,9 @@ try {
     console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
-const latestCovidCasesData = covidCasesData[covidCasesData.length - 1];
-const latestCompleteCovidCases = covidCasesData[
-    covidCasesData.length - (completeDelay + 1)
+const latestCovidCasesData = casesData.covid[casesData.covid.length - 1];
+const latestCompleteCovidCases = casesData.covid[
+    casesData.covid.length - (completeDelay + 1)
 ];
 
 const latestWeeklyDeathsData = weeklyDeathsData[weeklyDeathsData.length - 1];
@@ -60,7 +70,7 @@ const latestCompleteWeeklyDeaths = weeklyDeathsData[
 const deathsLastMonth = compute.rangeTotal(
     weeklyDeathsData,
     "isLastMonth",
-    {"timezone": covidCasesInfo.time_zone_name},
+    {"timezone": casesInfo.time_zone_name},
     "value"
 );
 
@@ -117,7 +127,7 @@ ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
 
 
-ui.displaySource(covidCasesInfo, staleWeekly);
+ui.displaySource(casesInfo, staleWeekly);
 
 /**
  * Palette via Coolors
@@ -126,13 +136,27 @@ ui.displaySource(covidCasesInfo, staleWeekly);
  */
 const chartManager = new ChartManager();
 
-const weekLabels = covidCasesData.map(
+const weekLabels = casesData.covid.map(
     row => chartManager.formatDate(row.date)
 );
 
 chartManager.displayData({
     "chartType": "line",
-    "element": document.querySelector("#nyc-week-covid-cases-chart"),
+    "element": document.querySelector("#nyc-covid-cases-chart"),
+    "labels": weekLabels,
+    "legend": {
+        "display": false
+    },
+    "title": "Cases per day (7-day average, confirmed and probable)",
+    "datasets": [{
+        "backgroundColor": "#E36414",
+        "data": casesData.covid.map(row => Math.round(row.value / 7))
+    }]
+});
+
+chartManager.displayData({
+    "chartType": "line",
+    "element": document.querySelector("#nyc-flu-cases-chart"),
     "labels": weekLabels,
     "legend": {
         "display": false
@@ -140,7 +164,21 @@ chartManager.displayData({
     "title": "Cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
-        "data": covidCasesData.map(row => Math.round(row.value / 7))
+        "data": casesData.flu.map(row => Math.round(row.value / 7))
+    }]
+});
+
+chartManager.displayData({
+    "chartType": "line",
+    "element": document.querySelector("#nyc-rsv-cases-chart"),
+    "labels": weekLabels,
+    "legend": {
+        "display": false
+    },
+    "title": "Cases per day (7-day average, confirmed and probable)",
+    "datasets": [{
+        "backgroundColor": "#5F0F40",
+        "data": casesData.rsv.map(row => Math.round(row.value / 7))
     }]
 });
 
