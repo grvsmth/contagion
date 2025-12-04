@@ -57,10 +57,15 @@ try {
     console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
-const latestCovidCasesData = casesData.covid[casesData.covid.length - 1];
-const latestCompleteCovidCases = casesData.covid[
-    casesData.covid.length - (completeDelay + 1)
-];
+const latestCasesData = {};
+const latestCompleteCases = {};
+
+for (const [key, data] of Object.entries(casesData)) {
+    latestCasesData[key] = casesData[key][casesData[key].length - 1];
+    latestCompleteCases[key] = casesData[key][
+        casesData[key].length - (completeDelay + 1)
+    ];
+}
 
 const latestWeeklyDeathsData = weeklyDeathsData[weeklyDeathsData.length - 1];
 const latestCompleteWeeklyDeaths = weeklyDeathsData[
@@ -83,7 +88,7 @@ const deathsThirtyDays = compute.rangeTotal(
     weeklyDeathsData, "daysFilter", thirtyDayThis, "value"
 );
 
-const staleWeekly = compute.isStale(staleThreshold, latestCovidCasesData.date);
+const staleWeekly = compute.isStale(staleThreshold, latestCasesData.covid.date);
 
 const ui = new Ui();
 ui.setOutput({
@@ -93,6 +98,20 @@ ui.setOutput({
         "sevenDayComplete": document.querySelector("#nyc-covid-cases-week-complete"),
         "sevenDayCompletePerLakh": document
             .querySelector("#nyc-covid-cases-week-complete-lakh")
+    },
+    "nycFluCases": {
+        "sevenDayAverage": document.querySelector("#nyc-flu-cases-week"),
+        "sevenDayPerLakh": document.querySelector("#nyc-flu-cases-week-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-flu-cases-week-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-flu-cases-week-complete-lakh")
+    },
+    "nycRsvCases": {
+        "sevenDayAverage": document.querySelector("#nyc-rsv-cases-week"),
+        "sevenDayPerLakh": document.querySelector("#nyc-rsv-cases-week-lakh"),
+        "sevenDayComplete": document.querySelector("#nyc-rsv-cases-week-complete"),
+        "sevenDayCompletePerLakh": document
+            .querySelector("#nyc-rsv-cases-week-complete-lakh")
     },
     "nycWeeklyDeaths": {
         "sevenDayAverage": document.querySelector("#nyc-deaths-week"),
@@ -119,10 +138,23 @@ ui.setOutput({
     }
 });
 
-ui.displayWeeklyData(latestCovidCasesData, latestWeeklyDeathsData);
+ui.displayWeeklyData(ui.output.nycCovidCases, latestCasesData.covid);
+ui.displayWeeklyData(ui.output.nycFluCases, latestCasesData.flu);
+ui.displayWeeklyData(ui.output.nycRsvCases, latestCasesData.rsv);
+ui.displayWeeklyData(ui.output.nycWeeklyDeaths, latestWeeklyDeathsData);
+
 ui.displayCompleteWeeklyData(
-    latestCompleteCovidCases, latestCompleteWeeklyDeaths
+    ui.output.nycCovidCases, latestCompleteCases.covid
 );
+ui.displayCompleteWeeklyData(ui.output.nycFluCases, latestCompleteCases.flu);
+ui.displayCompleteWeeklyData(ui.output.nycRsvCases, latestCompleteCases.rsv);
+ui.displayCompleteWeeklyData(
+    ui.output.nycWeeklyDeaths, latestCompleteWeeklyDeaths
+);
+
+ui.displayDate(ui.output.nycLatestWeek, latestCasesData.covid);
+ui.displayDate(ui.output.nycCompleteWeek, latestCompleteCases.covid);
+
 ui.displayLastMonth(deathsLastMonth);
 ui.displayThirtyDays(deathsThirtyDays);
 

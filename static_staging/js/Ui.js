@@ -22,42 +22,25 @@ export default class Ui {
         return (input * lakh * 10 / population).toFixed(2);
     }
 
-    displayWeeklyData(casesData, deathsData) {
-        const avg7dayCases = Math.round(casesData.value / 7);
+    displayWeeklyData(output, data) {
+        const avg7dayCases = Math.round(data.value / 7);
 
-        this.output.nycCovidCases.sevenDayAverage.innerText = avg7dayCases;
-        this.output.nycCovidCases.sevenDayPerLakh.innerText =
-            Ui.perLakh(avg7dayCases);
+        output.sevenDayAverage.innerText = avg7dayCases;
+        output.sevenDayPerLakh.innerText = Ui.perLakh(avg7dayCases);
+    }
 
-        const avg7dayDeaths = Math.round(deathsData.value / 7);
-
-        this.output.nycWeeklyDeaths.sevenDayAverage.innerText = avg7dayDeaths;
-        this.output.nycWeeklyDeaths.sevenDayPerLakh.innerText =
-            Ui.perLakh(avg7dayDeaths);
-
-        const latestDate = new Date(casesData.date);
-        this.output.nycLatestWeek.forEach((element) => {
+    displayDate(elements, data) {
+        const latestDate = new Date(data.date);
+        elements.forEach((element) => {
             element.innerText = latestDate.toLocaleDateString();
         });
     }
 
-    displayCompleteWeeklyData(casesData, deathsData) {
+    displayCompleteWeeklyData(output, casesData) {
         const avg7dayCases = Math.round(casesData.value / 7);
 
-        this.output.nycCovidCases.sevenDayComplete.innerText = avg7dayCases;
-        this.output.nycCovidCases.sevenDayCompletePerLakh.innerText =
-            Ui.perLakh(avg7dayCases);
-
-        const avg7dayDeaths = Math.round(deathsData.value / 7);
-
-        this.output.nycWeeklyDeaths.sevenDayComplete.innerText = avg7dayDeaths;
-        this.output.nycWeeklyDeaths.sevenDayCompletePerLakh.innerText =
-            Ui.perLakh(avg7dayDeaths);
-
-        const latestCompleteDate = new Date(casesData.date);
-        this.output.nycCompleteWeek.forEach((element) => {
-            element.innerText = latestCompleteDate.toLocaleDateString();
-        });
+        output.sevenDayComplete.innerText = avg7dayCases;
+        output.sevenDayCompletePerLakh.innerText = Ui.perLakh(avg7dayCases);
     }
 
     static createSourceElement(locality, isStale) {
