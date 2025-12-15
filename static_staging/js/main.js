@@ -57,6 +57,17 @@ try {
     console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
+const respDataUrl = "/api/" + apiVersion + "/resp-data/?season=2024-25";
+
+let respData = {};
+try {
+    respData = await cacheClient.fetchData(respDataUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + respDataUrl, error);
+}
+
+console.log("respData", respData);
+
 const latestCasesData = {};
 const latestCompleteCases = {};
 
@@ -88,7 +99,28 @@ const deathsThirtyDays = compute.rangeTotal(
     weeklyDeathsData, "daysFilter", thirtyDayThis, "value"
 );
 
+const respInfo = localityInfo.find((locality) =>
+    locality.name === localityName.resp
+);
+
+let respByStatus = {
+    "complete": {},
+    "latest": {}
+};
+
+if (respData.length) {
+    respByStatus["latest"] = respData[respData.length - 1];
+}
+
+if (respData.length > 3) {
+    respByStatus["complete"] = respData[respData.length - 3];
+}
+
 const staleWeekly = compute.isStale(staleThreshold, latestCasesData.covid.date);
+
+const staleResp = compute.isStale(
+    staleThreshold, respByStatus["complete"].week_ending_date
+);
 
 const ui = new Ui();
 ui.setOutput({
@@ -122,6 +154,24 @@ ui.setOutput({
         "lastMonth": document.querySelector("#nyc-deaths-last-month"),
         "thirtyDays": document.querySelector("#nyc-deaths-30days")
     },
+    "CDC_RESP_NET": {
+        "results": document.querySelector("#resp-results"),
+        "summary": document.querySelector("#resp-summary"),
+        "complete": {
+            "date": document.querySelector("#resp-complete-date"),
+            "combined": document.querySelector("#resp-complete-combined"),
+            "covid": document.querySelector("#resp-complete-covid"),
+            "flu": document.querySelector("#resp-complete-flu"),
+            "rsv": document.querySelector("#resp-complete-rsv")
+        },
+        "latest": {
+            "date": document.querySelector("#resp-latest-date"),
+            "combined": document.querySelector("#resp-latest-combined"),
+            "covid": document.querySelector("#resp-latest-covid"),
+            "flu": document.querySelector("#resp-latest-flu"),
+            "rsv": document.querySelector("#resp-latest-rsv")
+        }
+    },
     "nycLatestDate": document.querySelectorAll(".nyc-latest-date"),
     "nycCompleteDate": document.querySelectorAll(".nyc-complete-date"),
     "nycLatestWeek": document.querySelectorAll(".nyc-latest-week"),
@@ -152,6 +202,10 @@ ui.displayCompleteWeeklyData(
     ui.output.nycWeeklyDeaths, latestCompleteWeeklyDeaths
 );
 
+for (status in respByStatus) {
+    ui.displayRespData(status, respByStatus[status]);
+}
+
 ui.displayDate(ui.output.nycLatestWeek, latestCasesData.covid);
 ui.displayDate(ui.output.nycCompleteWeek, latestCompleteCases.covid);
 
@@ -160,6 +214,7 @@ ui.displayThirtyDays(deathsThirtyDays);
 
 
 ui.displaySource(casesInfo, staleWeekly);
+ui.displaySource(respInfo, staleResp);
 
 /**
  * Palette via Coolors
@@ -226,4 +281,42 @@ chartManager.displayData({
         "backgroundColor": "#FB8B24",
         "data": weeklyDeathsData.map(row => row.value)
     }]
+});
+
+chartManager.displayData({
+    "element": document.querySelector("#resp-chart"),
+    "labels": respData.map(row =>
+        chartManager.formatDate(row.week_ending_date)
+    ),
+    "legend": {
+        "display": true,
+        "position": "right"
+    },
+    "title": "Hospitalizations per lakh in the United States from CDC RESP-NET",
+    "datasets": [
+        {
+            "backgroundColor": "#E36414",
+            "data": respData.map(row => row.combined_rate),
+            "label": "Combined",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#FB8B24",
+            "data": respData.map(row => row.covid_rate),
+            "label": "COVID-19",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#9A031E",
+            "data": respData.map(row => row.flu_rate),
+            "label": "Influenza",
+            "type": "line"
+        },
+        {
+            "backgroundColor": "#5F0F40",
+            "data": respData.map(row => row.rsv_rate),
+            "label": "RSV",
+            "type": "line"
+        }
+    ]
 });
