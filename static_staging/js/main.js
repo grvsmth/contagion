@@ -57,7 +57,8 @@ try {
     console.log("Error retrieving data from " + weeklyDeathsDataUrl, error);
 }
 
-const respDataUrl = "/api/" + apiVersion + "/resp-data/?season=2024-25";
+const respDataUrl = "/api/" + apiVersion + "/resp-data/?season="
+    + compute.cdcSeason();
 
 let respData = {};
 try {
@@ -65,8 +66,6 @@ try {
 } catch (error) {
     console.log("Error retrieving data from " + respDataUrl, error);
 }
-
-console.log("respData", respData);
 
 const latestCasesData = {};
 const latestCompleteCases = {};

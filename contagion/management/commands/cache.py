@@ -5,7 +5,6 @@ from json import loads
 from statistics import fmean
 from zoneinfo import ZoneInfo
 
-
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.timezone import make_aware
 
@@ -48,12 +47,24 @@ class Command(BaseCommand):
         parser.add_argument("localities", nargs="+")
 
     @staticmethod
-    def fetch(nowUrl, localityName='NYC'):
+    def cdcSeason():
+        nowTime = datetime.now()
+        if nowTime.month < 11:
+            return str(nowTime.year - 1) + '-' + str(nowTime.year)[2:]
+
+        return str(nowTime.year) + '-' + str(nowTime.year + 1)[2:]
+
+    @classmethod
+    def fetch(cls, nowUrl, localityName='NYC'):
         if localityName == 'NYC_Wastewater':
             nowUrl = (nowUrl
             + '?$limit=5000&$$app_token=' + NYC_OPEN_DATA['APP_TOKEN']
             + '&technology=' + NYC_OPEN_DATA['WASTEWATER_TECHNOLOGY'])
 
+        if localityName == 'CDC_RESP_NET':
+            nowUrl = nowUrl + '&season=' + cls.cdcSeason()
+
+        print(nowUrl)
         res = get(nowUrl)
         return res.content.decode('utf-8')
 
@@ -258,6 +269,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for localityName in options['localities']:
             locality = self.getLocality(localityName)
+
             content = self.fetch(locality.now_url, localityName)
             if localityName in weeklyLocalities:
                 self.cacheWeekData(locality, content)

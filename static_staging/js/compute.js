@@ -68,4 +68,15 @@ exports.isStale = function(thresholdDays, inputDateString) {
     return inputDate <= thresholdDate;
 };
 
+exports.cdcSeason = function() {
+    const nowDate = new Date();
+    const nowYear = nowDate.getFullYear();
+
+    if (nowDate.getMonth() < 9) {
+        return (nowYear - 1).toString() + "-" + nowYear.toString().substring(2);
+    }
+
+    return nowYear.toString() + "-" + (nowYear + 1).toString().substring(2)
+}
+
 export default exports;
