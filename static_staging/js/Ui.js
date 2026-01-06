@@ -22,44 +22,25 @@ export default class Ui {
         return (input * lakh * 10 / population).toFixed(2);
     }
 
-    displayLatestData(data) {
-        this.output.nycHospitalization.sevenDayAverage.innerText =
-            data.hosp_count_7day_avg;
-        this.output.nycHospitalization.sevenDayPerLakh.innerText =
-            Ui.perLakh(data.hosp_count_7day_avg);
+    displayWeeklyData(output, data) {
+        const avg7dayCases = Math.round(data.value / 7);
 
-        this.output.nycCases.sevenDayAverage.innerText =
-            data.all_case_count_7day_avg;
-        this.output.nycCases.sevenDayPerLakh.innerText =
-            Ui.perLakh(data.all_case_count_7day_avg);
+        output.sevenDayAverage.innerText = avg7dayCases;
+        output.sevenDayPerLakh.innerText = Ui.perLakh(avg7dayCases);
+    }
 
-        this.output.nycDeath.sevenDayAverage.innerText =
-            data.death_count_7day_avg;
-
-        const latestDate = new Date(data.date_of_interest);
-        this.output.nycLatestDate.forEach((element) => {
+    displayDate(elements, data) {
+        const latestDate = new Date(data.date);
+        elements.forEach((element) => {
             element.innerText = latestDate.toLocaleDateString();
         });
     }
 
-    displayCompleteData(data) {
-        this.output.nycHospitalization.sevenDayComplete.innerText =
-            data.hosp_count_7day_avg;
-        this.output.nycHospitalization.sevenDayCompletePerLakh.innerText =
-            Ui.perLakh(data.hosp_count_7day_avg);
+    displayCompleteWeeklyData(output, casesData) {
+        const avg7dayCases = Math.round(casesData.value / 7);
 
-        this.output.nycCases.sevenDayComplete.innerText =
-            data.all_case_count_7day_avg;
-        this.output.nycCases.sevenDayCompletePerLakh.innerText =
-            Ui.perLakh(data.all_case_count_7day_avg);
-        this.output.nycDeath.sevenDayComplete.innerText =
-            data.death_count_7day_avg;
-
-        const latestCompleteDate = new Date(data.date_of_interest);
-        this.output.nycCompleteDate.forEach((element) => {
-            element.innerText = latestCompleteDate.toLocaleDateString();
-        });
-
+        output.sevenDayComplete.innerText = avg7dayCases;
+        output.sevenDayCompletePerLakh.innerText = Ui.perLakh(avg7dayCases);
     }
 
     static createSourceElement(locality, isStale) {
@@ -184,8 +165,8 @@ export default class Ui {
     }
 
     displayLastMonth(lastMonth) {
-        this.output.nycDeath.lastMonth.innerText = lastMonth.deaths;
-        const monthText = `${lastMonth.monthName}, ${lastMonth.days} days`;
+        this.output.nycWeeklyDeaths.lastMonth.innerText = lastMonth.deaths;
+        const monthText = `${lastMonth.monthName}, ${lastMonth.days} weeks`;
 
         this.output.nycLastMonth.forEach((element) => {
             element.innerText = monthText;
@@ -193,7 +174,7 @@ export default class Ui {
     }
 
     displayThirtyDays(thirtyDays) {
-        this.output.nycDeath.thirtyDays.innerText = thirtyDays.deaths;
+        this.output.nycWeeklyDeaths.thirtyDays.innerText = thirtyDays.deaths;
         this.output.nycComplete30Begin.innerText = thirtyDays.beginDate;
     }
 

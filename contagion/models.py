@@ -7,7 +7,8 @@ from django.db.models import (
     ForeignKey,
     IntegerField,
     Model,
-    TextField
+    TextField,
+    UniqueConstraint
     )
 
 class Locality(Model):
@@ -37,6 +38,30 @@ class DayData(Model):
         related_name='dayData',
         on_delete=CASCADE
     )
+
+class WeekData(Model):
+    date = DateTimeField('date')
+    metric = CharField("metric", max_length=100, db_index=True)
+    submetric = CharField("submetric", max_length=100, db_index=True, null=True)
+    value = IntegerField()
+
+    locality = ForeignKey(
+        Locality,
+        verbose_name="locality",
+        related_name='weekData',
+        on_delete=CASCADE
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                "date",
+                "metric",
+                "submetric",
+                "locality",
+                name="uniqueDateLocality"
+            )
+        ]
 
 class RespData(Model):
     week_ending_date = DateTimeField('week ending date', db_index=True)

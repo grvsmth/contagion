@@ -11,7 +11,8 @@ from contagion.models import (
     Locality,
     RespData,
     WastewaterAverage,
-    WastewaterData
+    WastewaterData,
+    WeekData
 )
 
 class GroupSerializer(HyperlinkedModelSerializer):
@@ -51,6 +52,22 @@ class DayDataSerializer(HyperlinkedModelSerializer):
             'death_count',
             'death_count_7day_avg',
             'incomplete'
+        ]
+
+
+class WeekDataSerializer(HyperlinkedModelSerializer):
+    locality = PrimaryKeyRelatedField(
+        queryset=Locality.objects.all()
+    )
+
+    class Meta:
+        model = WeekData
+        fields = [
+            'locality',
+            'date',
+            'metric',
+            'submetric',
+            'value'
         ]
 
 

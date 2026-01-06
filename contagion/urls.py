@@ -30,6 +30,7 @@ from contagion.views import (
     RespDataViewSet,
     WastewaterAverageViewSet,
     WastewaterDataViewSet,
+    WeekDataViewSet
 )
 from contagion.settings import API_VERSION, MEDIA_ROOT, MEDIA_URL
 
@@ -44,6 +45,7 @@ router.register(r'resp-data', RespDataViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'wastewater-averages', WastewaterAverageViewSet)
 router.register(r'wastewater-data', WastewaterDataViewSet)
+router.register(r'week-data', WeekDataViewSet)
 
 
 urlpatterns = [
