@@ -17,6 +17,7 @@ const localityName = {
 const apiVersion = 0.1;
 const staleThreshold = 30;
 const completeDelay = 2;
+const wrrf = "Bowery Bay";
 
 const localityUrl = "/api/" + apiVersion + "/localities/";
 
@@ -115,10 +116,37 @@ if (respData.length > 3) {
     respByStatus["complete"] = respData[respData.length - 3];
 }
 
+const wastewaterInfo = localityInfo.find((locality) =>
+    locality.name === localityName.wastewater);
+const wastewaterDataUrl = '/api/' + apiVersion + '/wastewater-data/';
+const wastewaterAveragesUrl = '/api/' + apiVersion + '/wastewater-averages/';
+
+let wastewaterAverages = {};
+let wastewaterData = {};
+
+try {
+    wastewaterAverages = await cacheClient.fetchData(wastewaterAveragesUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + wastewaterAveragesUrl, error);
+}
+
+try {
+    wastewaterData = await cacheClient.fetchData(wastewaterDataUrl);
+} catch (error) {
+    console.log("Error retrieving data from " + wastewaterDataUrl, error);
+}
+
+const latestWastewaterAverage = wastewaterAverages[wastewaterAverages.length - 1];
+const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
+
 const staleWeekly = compute.isStale(staleThreshold, latestCasesData.covid.date);
 
 const staleResp = compute.isStale(
     staleThreshold, respByStatus["complete"].week_ending_date
+);
+
+const staleWastewater = compute.isStale(
+    staleThreshold, latestWastewaterAverage.end_date
 );
 
 const ui = new Ui();
@@ -152,6 +180,12 @@ ui.setOutput({
             .querySelector("#nyc-deaths-week-complete-lakh"),
         "lastMonth": document.querySelector("#nyc-deaths-last-month"),
         "thirtyDays": document.querySelector("#nyc-deaths-30days")
+    },
+    "nycWastewater": {
+        "latestAverage": document.querySelector("#nyc-wastewater-14day"),
+        "latestCount": document.querySelector("#nyc-wastewater-latest-count"),
+        "latestDate": document.querySelector("#nyc-wastewater-latest-date"),
+        "wrrf": document.querySelector("#nyc-wrrf"),
     },
     "CDC_RESP_NET": {
         "results": document.querySelector("#resp-results"),
@@ -205,6 +239,9 @@ for (status in respByStatus) {
     ui.displayRespData(status, respByStatus[status]);
 }
 
+ui.displayLatestWastewaterData(latestWastewaterData);
+ui.displayLatestWastewaterAverage(latestWastewaterAverage);
+
 ui.displayDate(ui.output.nycLatestWeek, latestCasesData.covid);
 ui.displayDate(ui.output.nycCompleteWeek, latestCompleteCases.covid);
 
@@ -214,6 +251,7 @@ ui.displayThirtyDays(deathsThirtyDays);
 
 ui.displaySource(casesInfo, staleWeekly);
 ui.displaySource(respInfo, staleResp);
+ui.displaySource(wastewaterInfo, staleWeekly);
 
 /**
  * Palette via Coolors
@@ -247,7 +285,7 @@ chartManager.displayData({
     "legend": {
         "display": false
     },
-    "title": "Cases per day (7-day average, confirmed and probable)",
+    "title": "Flu cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#9A031E",
         "data": casesData.flu.map(row => Math.round(row.value / 7))
@@ -261,7 +299,7 @@ chartManager.displayData({
     "legend": {
         "display": false
     },
-    "title": "Cases per day (7-day average, confirmed and probable)",
+    "title": "RSV cases per day (7-day average, confirmed and probable)",
     "datasets": [{
         "backgroundColor": "#5F0F40",
         "data": casesData.rsv.map(row => Math.round(row.value / 7))
@@ -280,6 +318,32 @@ chartManager.displayData({
         "backgroundColor": "#FB8B24",
         "data": weeklyDeathsData.map(row => row.value)
     }]
+});
+
+chartManager.displayData({
+    "chartType": "line",
+    "element": document.querySelector("#nyc-wastewater-chart"),
+    "labels": wastewaterAverages.map(row =>
+        chartManager.formatDate(row.end_date)
+    ),
+    "legend": {
+        "display": false
+    },
+    "title": "dPCR-SC2 copies, rolling two-week average",
+    "datasets": [{
+        "backgroundColor": "#E36414",
+        "data": wastewaterAverages.map(row => row.average)
+    }],
+    "options": {
+        "scales": {
+            "x": {
+                "type": "time",
+                "time": {
+                    "unit": "month"
+                }
+            }
+        }
+    }
 });
 
 chartManager.displayData({
