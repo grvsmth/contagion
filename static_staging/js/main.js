@@ -333,7 +333,17 @@ chartManager.displayData({
     "datasets": [{
         "backgroundColor": "#E36414",
         "data": wastewaterAverages.map(row => row.average)
-    }]
+    }],
+    "options": {
+        "scales": {
+            "x": {
+                "type": "time",
+                "time": {
+                    "unit": "month"
+                }
+            }
+        }
+    }
 });
 
 chartManager.displayData({
