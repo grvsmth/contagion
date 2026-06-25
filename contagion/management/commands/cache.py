@@ -1,7 +1,7 @@
 from copy import deepcopy
 from csv import DictReader
 from datetime import datetime, timedelta
-from json import loads
+from json import loads, dumps
 from statistics import fmean
 from zoneinfo import ZoneInfo
 
@@ -140,11 +140,12 @@ class Command(BaseCommand):
                     submetric=weekDict.get('submetric'),
                     locality=locality.pk
                 )
+                weekData.is_valid(raise_exception=True)
+                weekData.save(locality=locality)
             except(WeekData.DoesNotExist, ValidationError):
+                print("Invalid week data: " + dumps(row))
                 pass
 
-            weekData.is_valid(raise_exception=True)
-            weekData.save(locality=locality)
 
     def cacheRespData(self, locality, content):
         byWeek = {}
