@@ -88,7 +88,7 @@ class Command(BaseCommand):
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
         value = row['value']
-        if not value:
+        if (not value) or value == "" or value == "<5":
             value = 0
 
         weekDict = {
@@ -142,10 +142,14 @@ class Command(BaseCommand):
                 )
                 weekData.is_valid(raise_exception=True)
                 weekData.save(locality=locality)
-            except(WeekData.DoesNotExist, ValidationError):
+
+            except(ValidationError):
                 print("Invalid week data: " + dumps(row))
                 pass
 
+            except(WeekData.DoesNotExist):
+                weekData.is_valid(raise_exception=True)
+                weekData.save(locality=locality)
 
     def cacheRespData(self, locality, content):
         byWeek = {}
