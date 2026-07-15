@@ -196,9 +196,14 @@ class Command(BaseCommand):
 
         try:
             averageData.instance = WastewaterAverage.objects.get(
-                end_date=data.get('end_date')
+                end_date=data.get('end_date'),
+                wrrf=data.get('wrrf')
             )
-        except(WastewaterAverage.DoesNotExist, ValidationError):
+        except(ValidationError):
+            print("Invalid wastewater data: " + dumps(data))
+            pass
+
+        except(WastewaterAverage.DoesNotExist):
             pass
 
         averageData.is_valid(raise_exception=True)
@@ -235,6 +240,7 @@ class Command(BaseCommand):
 
                 previousAverage = average
                 dbDate = str(make_aware(endDate))
+
                 self.cacheWastewaterAverage(
                     {
                         'wrrf': wrrf,

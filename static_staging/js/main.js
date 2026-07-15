@@ -18,6 +18,7 @@ const apiVersion = 0.1;
 const staleThreshold = 30;
 const completeDelay = 2;
 const wrrf = "Bowery Bay";
+const wrrfId = "BB";
 
 const localityUrl = "/api/" + apiVersion + "/localities/";
 
@@ -61,13 +62,6 @@ try {
 const respDataUrl = "/api/" + apiVersion + "/resp-data/?season="
     + compute.cdcSeason();
 
-let respData = {};
-try {
-    respData = await cacheClient.fetchData(respDataUrl);
-} catch (error) {
-    console.log("Error retrieving data from " + respDataUrl, error);
-}
-
 const latestCasesData = {};
 const latestCompleteCases = {};
 
@@ -99,27 +93,12 @@ const deathsThirtyDays = compute.rangeTotal(
     weeklyDeathsData, "daysFilter", thirtyDayThis, "value"
 );
 
-const respInfo = localityInfo.find((locality) =>
-    locality.name === localityName.resp
-);
-
-let respByStatus = {
-    "complete": {},
-    "latest": {}
-};
-
-if (respData.length) {
-    respByStatus["latest"] = respData[respData.length - 1];
-}
-
-if (respData.length > 3) {
-    respByStatus["complete"] = respData[respData.length - 3];
-}
-
 const wastewaterInfo = localityInfo.find((locality) =>
     locality.name === localityName.wastewater);
-const wastewaterDataUrl = '/api/' + apiVersion + '/wastewater-data/';
-const wastewaterAveragesUrl = '/api/' + apiVersion + '/wastewater-averages/';
+const wastewaterDataUrl = '/api/' + apiVersion + '/wastewater-data/'
+    + '?wrrf_abbreviation=' + wrrfId;
+const wastewaterAveragesUrl = '/api/' + apiVersion + '/wastewater-averages/'
+    + '?wrrf=' + wrrfId;
 
 let wastewaterAverages = {};
 let wastewaterData = {};
@@ -140,10 +119,6 @@ const latestWastewaterAverage = wastewaterAverages[wastewaterAverages.length - 1
 const latestWastewaterData = wastewaterData[wastewaterData.length - 1];
 
 const staleWeekly = compute.isStale(staleThreshold, latestCasesData.covid.date);
-
-const staleResp = compute.isStale(
-    staleThreshold, respByStatus["complete"].week_ending_date
-);
 
 const staleWastewater = compute.isStale(
     staleThreshold, latestWastewaterAverage.end_date
@@ -235,10 +210,6 @@ ui.displayCompleteWeeklyData(
     ui.output.nycWeeklyDeaths, latestCompleteWeeklyDeaths
 );
 
-for (status in respByStatus) {
-    ui.displayRespData(status, respByStatus[status]);
-}
-
 ui.displayLatestWastewaterData(latestWastewaterData);
 ui.displayLatestWastewaterAverage(latestWastewaterAverage);
 
@@ -250,7 +221,6 @@ ui.displayThirtyDays(deathsThirtyDays);
 
 
 ui.displaySource(casesInfo, staleWeekly);
-ui.displaySource(respInfo, staleResp);
 ui.displaySource(wastewaterInfo, staleWeekly);
 
 /**
@@ -344,42 +314,4 @@ chartManager.displayData({
             }
         }
     }
-});
-
-chartManager.displayData({
-    "element": document.querySelector("#resp-chart"),
-    "labels": respData.map(row =>
-        chartManager.formatDate(row.week_ending_date)
-    ),
-    "legend": {
-        "display": true,
-        "position": "right"
-    },
-    "title": "Hospitalizations per lakh in the United States from CDC RESP-NET",
-    "datasets": [
-        {
-            "backgroundColor": "#E36414",
-            "data": respData.map(row => row.combined_rate),
-            "label": "Combined",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#FB8B24",
-            "data": respData.map(row => row.covid_rate),
-            "label": "COVID-19",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#9A031E",
-            "data": respData.map(row => row.flu_rate),
-            "label": "Influenza",
-            "type": "line"
-        },
-        {
-            "backgroundColor": "#5F0F40",
-            "data": respData.map(row => row.rsv_rate),
-            "label": "RSV",
-            "type": "line"
-        }
-    ]
 });
