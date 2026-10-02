@@ -80,7 +80,14 @@ class Command(BaseCommand):
 
     @classmethod
     def convertWeekData(cls, locality, row):
-        (month, day, year) = row['date'].split('/')
+        try:
+            (month, day, year) = row['date'].split('/')
+        except ValueError:
+            try:
+                (year, month, day) = row['date'].split('-')
+            except ValueError:
+                raise ValueError("Can't parse date: " + row['date'] + "\n")
+
         inputDatetime = datetime(
             int(year),
             int(month),

@@ -3,6 +3,7 @@ from django.db.models import (
     CASCADE,
     CharField,
     DateTimeField,
+    DecimalField,
     FloatField,
     ForeignKey,
     IntegerField,
@@ -43,7 +44,7 @@ class WeekData(Model):
     date = DateTimeField('date')
     metric = CharField("metric", max_length=100, db_index=True)
     submetric = CharField("submetric", max_length=100, db_index=True, null=True)
-    value = IntegerField()
+    value = DecimalField(max_digits=10, decimal_places=3)
 
     locality = ForeignKey(
         Locality,
