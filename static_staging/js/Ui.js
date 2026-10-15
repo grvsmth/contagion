@@ -166,6 +166,7 @@ export default class Ui {
 
     displayLastMonth(lastMonth) {
         this.output.nycWeeklyDeaths.lastMonth.innerText = lastMonth.deaths;
+
         const monthText = `${lastMonth.monthName}, ${lastMonth.days} weeks`;
 
         this.output.nycLastMonth.forEach((element) => {
