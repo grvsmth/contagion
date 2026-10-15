@@ -80,7 +80,14 @@ class Command(BaseCommand):
 
     @classmethod
     def convertWeekData(cls, locality, row):
-        (month, day, year) = row['date'].split('/')
+        try:
+            (month, day, year) = row['date'].split('/')
+        except ValueError:
+            try:
+                (year, month, day) = row['date'].split('-')
+            except ValueError:
+                raise ValueError("Can't parse date: " + row['date'] + "\n")
+
         inputDatetime = datetime(
             int(year),
             int(month),
@@ -88,7 +95,7 @@ class Command(BaseCommand):
             tzinfo=ZoneInfo(locality.time_zone_name)
         )
         value = row['value']
-        if not value:
+        if (not value) or value == "" or value == "<5":
             value = 0
 
         weekDict = {
@@ -142,10 +149,14 @@ class Command(BaseCommand):
                 )
                 weekData.is_valid(raise_exception=True)
                 weekData.save(locality=locality)
-            except(WeekData.DoesNotExist, ValidationError):
+
+            except(ValidationError):
                 print("Invalid week data: " + dumps(row))
                 pass
 
+            except(WeekData.DoesNotExist):
+                weekData.is_valid(raise_exception=True)
+                weekData.save(locality=locality)
 
     def cacheRespData(self, locality, content):
         byWeek = {}
@@ -192,9 +203,14 @@ class Command(BaseCommand):
 
         try:
             averageData.instance = WastewaterAverage.objects.get(
-                end_date=data.get('end_date')
+                end_date=data.get('end_date'),
+                wrrf=data.get('wrrf')
             )
-        except(WastewaterAverage.DoesNotExist, ValidationError):
+        except(ValidationError):
+            print("Invalid wastewater data: " + dumps(data))
+            pass
+
+        except(WastewaterAverage.DoesNotExist):
             pass
 
         averageData.is_valid(raise_exception=True)
@@ -231,6 +247,7 @@ class Command(BaseCommand):
 
                 previousAverage = average
                 dbDate = str(make_aware(endDate))
+
                 self.cacheWastewaterAverage(
                     {
                         'wrrf': wrrf,

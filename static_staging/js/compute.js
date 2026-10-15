@@ -17,7 +17,14 @@ exports.daysFilter = function(dayItem) {
 };
 
 exports.addValues = function(accumulator, currentValue) {
-    return accumulator + currentValue;
+    const currentInt = parseInt(currentValue);
+
+    if (isNaN(currentInt)) {
+        console.log("currentValue is NaN", currentValue);
+        return accumulator;
+    }
+
+    return accumulator + currentInt;
 };
 
 exports.rangeTotal = function(dayData, filterKey, filterThis, propertyKey) {
